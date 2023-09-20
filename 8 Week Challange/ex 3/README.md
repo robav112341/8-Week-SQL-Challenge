@@ -241,3 +241,94 @@ JOIN min_date md ON nd.customer_id = md.customer_id;
 | plan_name  | time_AVG                |
 | ---------- | ----------------------- |
 | pro annual | 105                     |
+
+**10. Can you further breakdown this average value into 30 day periods (i.e. 0-30 days, 31-60 days etc)**
+
+````sql
+ WITH min_date AS (
+	SELECT 
+		customer_id,
+		start_date AS min_date
+	FROM
+		subscriptions
+	 WHERE plan_id = 0
+	GROUP BY customer_id),
+now_date AS (
+	SELECT 
+		customer_id, 
+		start_date AS now_date 
+    FROM subscriptions 
+    WHERE plan_id = 3)
+SELECT
+(SELECT plan_name FROM plans WHERE plan_id = 3) AS plan_name,
+CASE
+	WHEN nd.now_date - md.min_date < 31 THEN '0-30'
+	WHEN nd.now_date - md.min_date BETWEEN 31 AND 60 THEN '31-60'
+    WHEN nd.now_date - md.min_date BETWEEN 61 AND 90 THEN '61-90'
+    WHEN nd.now_date - md.min_date BETWEEN 91 AND 120 THEN '91-120'
+    WHEN nd.now_date - md.min_date BETWEEN 121 AND 150 THEN '121-150'
+    WHEN nd.now_date - md.min_date BETWEEN 151 AND 180 THEN '151-180'
+    WHEN nd.now_date - md.min_date BETWEEN 181 AND 210 THEN '181-210'
+    WHEN nd.now_date - md.min_date BETWEEN 211 AND 240 THEN '211-240'
+    WHEN nd.now_date - md.min_date BETWEEN 241 AND 271 THEN '241-270'
+    WHEN nd.now_date - md.min_date BETWEEN 271 AND 300 THEN '271-300'
+    WHEN nd.now_date - md.min_date BETWEEN 301 AND 330 THEN '301-330'
+    WHEN nd.now_date - md.min_date BETWEEN 331 AND 360 THEN '331-360'
+    ELSE '360+' END AS the_time_pass,
+	COUNT(*) AS costumer_count,
+    ROUND(AVG(nd.now_date - md.min_date),0) AS time_p_AVG
+FROM now_date nd
+JOIN min_date md ON nd.customer_id = md.customer_id
+GROUP BY the_time_pass
+ORDER BY CASE	
+	WHEN the_time_pass = '0-30' THEN 1
+    WHEN the_time_pass = '31-60' THEN 2
+	WHEN the_time_pass = '61-90' THEN 3
+    WHEN the_time_pass = '91-120' THEN 4
+    WHEN the_time_pass = '121-150' THEN 5
+    WHEN the_time_pass = '151-180' THEN 6
+    WHEN the_time_pass = '181-210' THEN 7
+    WHEN the_time_pass = '211-240' THEN 8
+    WHEN the_time_pass = '241-270' THEN 9
+    WHEN the_time_pass = '271-300' THEN 10
+    WHEN the_time_pass = '301-330' THEN 11
+	WHEN the_time_pass = '331-360' THEN 12
+	WHEN the_time_pass = '360+' THEN 13 END;
+````
+
+| plan_name  | the_time_pass            | costumer_count      | time_p_AVG              |
+| ---------- | ------------------------ | ------------------- | ----------------------- |
+| pro annual | 0-30 days                | 49                  | 10                      |
+| pro annual | 31-60 days               | 24                  | 42                      |
+| pro annual | 61-90 days               | 34                  | 71                      |
+| pro annual | 91-120 days              | 35                  | 101                     |
+| pro annual | 121-150 days             | 42                  | 133                     |
+| pro annual | 151-180 days             | 36                  | 162                     |
+| pro annual | 181-210 days             | 26                  | 191                     |
+| pro annual | 211-240 days             | 4                   | 224                     |
+| pro annual | 241-270 days             | 5                   | 257                     |
+| pro annual | 271-300 days             | 1                   | 285                     |
+| pro annual | 301-330 days             | 1                   | 327                     |
+| pro annual | 331-360 days             | 1                   | 346                     |
+
+**11. How many customers downgraded from a pro monthly to a basic monthly plan in 2020?**
+
+````sql
+WITH cte AS (
+	SELECT
+		customer_id,
+		plan_id AS current_id,
+		LAG(customer_id,1) OVER(PARTITION BY customer_id) AS pre_id,
+		start_date
+	FROM
+		subscriptions)
+SELECT
+	COUNT(*) AS count_donwgrade
+FROM
+	cte
+WHERE current_id = 1 AND pre_id = 2 AND YEAR(start_date) = 2020;
+````
+
+| count_donwgrade |
+| --------------- |
+|        0        |
