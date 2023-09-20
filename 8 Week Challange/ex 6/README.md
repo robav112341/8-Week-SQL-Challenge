@@ -1,5 +1,5 @@
 # Case Study #6: Clique Bait
-<img src="https://user-images.githubusercontent.com/81607668/129742132-8e13c136-adf2-49c4-9866-dec6be0d30f0.png" width="500" height="520" alt="image">
+<img src="https://user-images.githubusercontent.com/81607668/134615258-d1108e0d-0816-4cd7-a972-d45580f82352.png" alt="Image" width="500" height="520">
 
 ## 📚 Table of Contents
 - [Business Task](#problem-statement)
