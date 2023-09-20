@@ -14,4 +14,4 @@
 
 Solved on Postgres using various SQL techniques like conditional `WHERE` statements, data aggregation with `GROUP BY` and ordering with `ORDER BY`, `CASE WHEN` Statements, string transformations, regular expressions, datetime manipulation, common table expressions (CTE), subqueries and nested queries, complex table joins (Inner, Outer, Left, Right, Lateral - no Cross Joins - but it was possible to use them too), window functions (`row_number()`, `rank()`, `dense_rank()`, `lag()`, `lead()`).
 
-**MySQL workbench**
+***MySQL workbench**
