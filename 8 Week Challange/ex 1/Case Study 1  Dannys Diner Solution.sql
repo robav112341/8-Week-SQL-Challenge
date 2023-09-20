@@ -15,7 +15,8 @@ SELECT
     customer_id, COUNT(DISTINCT order_date) AS num_of_days
 FROM
     sales
-GROUP BY customer_id;
+GROUP BY customer_id
+ORDER BY 1;
 
 -- Question 3:
 -- What was the first item from the menu purchased by each customer?
@@ -68,12 +69,15 @@ count_table AS (
 		cte
 	GROUP BY customer_id, product_id)
 SELECT
-	customer_id,
-	product_id,
-	purch_times
+	ct.customer_id,
+	m.product_name,
+	ct.purch_times
 FROM
-	count_table
-WHERE ranks = 1;
+	count_table ct
+JOIN menu m 
+	ON ct.product_id = m.product_id
+WHERE ct.ranks = 1
+ORDER BY 1;
 
 -- Question 6:
 -- Which item was purchased first by the customer after they became a member?
@@ -199,7 +203,7 @@ SELECT
         ) AS membership
 FROM
     sales s
-        JOIN
+        LEFT JOIN
     members m ON s.customer_id = m.customer_id
         JOIN
     menu mn ON s.product_id = mn.product_id
