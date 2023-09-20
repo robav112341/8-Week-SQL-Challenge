@@ -21,3 +21,6 @@ Danny realised that he wanted to create a new streaming service that only had fo
 This case study focuses on using subscription style digital data to answer important business questions.
 
 ## Case Study Questions
+
+**A. Customer Journey**
+**
