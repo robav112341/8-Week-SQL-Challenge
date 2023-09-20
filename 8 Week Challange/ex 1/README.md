@@ -58,3 +58,30 @@ GROUP BY customer_id;
 | A           | 2021-01-01  | sushi       |
 | B           | 2021-01-01  | curry       |
 | C           | 2021-01-01  | ramen       |
+
+**4. What is the most purchased item on the menu and how many times was it purchased by all customers?**
+
+````sql
+WITH cte AS (
+	SELECT
+		product_id,
+		COUNT(*) AS total
+	FROM
+		sales
+    GROUP BY product_id) 
+SELECT
+	m.product_name,
+	c.product_id,
+	c.total
+FROM
+	cte c
+JOIN 
+	menu m
+ON c.product_id = m.product_id
+WHERE total = (SELECT MAX(total) FROM cte);
+````
+
+| product_name | product_id | total |
+| -----------  | -----------| ----  |
+| A            |     3      |   8   |
+
