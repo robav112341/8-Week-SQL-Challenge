@@ -215,7 +215,7 @@ GROUP BY 1;
 | Shellfish        | 6204       | 3792     |
 
 
-**9. What are the top 3 products by purchases?
+**9. What are the top 3 products by purchases?**
 
 ````sql
 WITH rank_events  AS (
