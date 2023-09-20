@@ -21,3 +21,52 @@ Clique Bait is not like your regular online seafood store - the founder and CEO 
 In this case study - you are required to support Danny’s vision and analyse his dataset and come up with creative solutions to calculate funnel fallout rates for the Clique Bait online store.
 
 ## Case Study Questions
+**Digital Analysis**
+
+**1. How many users are there?**
+
+````sql
+SELECT 
+    COUNT(DISTINCT user_id) AS users_count
+FROM
+    USERS
+;
+````
+
+| users_count |
+| ----------- |
+|    500      |
+
+**2. How many cookies does each user have on average?** 
+
+````sql
+SELECT 
+    ROUND(COUNT(*) / COUNT(DISTINCT user_id),2) AS avg_per_user
+FROM
+    USERS
+;
+````
+
+| avg_per_user |
+| ------------ |
+|    3.56      |
+
+**3. What is the unique number of visits by all users per month?**
+
+````sql
+SELECT 
+    MONTHNAME(event_time) AS month_name,
+    COUNT(DISTINCT visit_id) AS visits_count
+FROM
+    EVENTS
+GROUP BY 1
+ORDER BY event_time;
+````
+
+| month_name| visits_count  |
+| --------- | ------------- |
+| January   | 876           |
+| February  | 1488          |
+| March     | 916           |
+| April     | 248           |
+| May       | 36            |
