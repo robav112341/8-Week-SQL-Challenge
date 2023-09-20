@@ -85,3 +85,40 @@ WHERE total = (SELECT MAX(total) FROM cte);
 | -----------  | -----------| ----  |
 | A            |     3      |   8   |
 
+**5. Which item was the most popular for each customer?**
+
+````sql
+WITH cte AS (
+	SELECT 
+		customer_id,
+		product_id,
+		ROW_NUMBER() OVER (PARTITION BY customer_id, product_id) AS times
+FROM
+		sales),
+count_table AS (
+	SELECT 
+		customer_id,
+		product_id,
+		MAX(times) as purch_times,
+		RANK() OVER (PARTITION BY customer_id ORDER BY MAX(times) DESC) AS ranks
+	FROM
+		cte
+	GROUP BY customer_id, product_id)
+SELECT
+	ct.customer_id,
+	m.product_name,
+	ct.purch_times
+FROM
+	count_table ct
+JOIN menu m 
+	ON ct.product_id = m.product_id
+WHERE ct.ranks = 1;
+````
+
+| customer_id | product_name | purch_times |
+| ----------- | ------------ | ----------  |
+| A           | ramen        | 3           |
+| B           | sushi        | 2           |
+| B           | curry        | 2           |
+| B           | ramen        | 2           |
+| C           | ramen        | 3           |
