@@ -115,3 +115,56 @@ GROUP BY 1;
 | event_type | event_name | count_type 3 | percentage |
 | ---------- | ---------- | ------------ | ---------- |
 |     3      |  Purchase  |    1777      |   49.9     |
+
+**6. What is the percentage of visits which view the checkout page but do not have a purchase event?**
+
+````sql
+SELECT 
+    COUNT(DISTINCT visit_id) AS count_,
+    ROUND(COUNT(DISTINCT visit_id) / (SELECT 
+                    COUNT(DISTINCT visit_id)
+                FROM
+                    events) * 100,
+            1) AS percentage
+FROM
+    events e
+        JOIN
+    event_identifier ei ON e.event_type = ei.event_type
+        JOIN
+    page_hierarchy ph ON e.page_id = ph.page_id
+WHERE
+    e.event_type <> 3 AND ph.page_id = 12
+        AND visit_id NOT IN (SELECT DISTINCT
+            visit_id
+        FROM
+            events
+        WHERE
+            event_type = 3);
+````
+
+| count_ | percentage |
+| ------ | ---------- |
+|  326   |  9.1       |
+
+
+**7. What are the top 3 pages by number of views?**
+
+````sql
+SELECT 
+    ph.page_name, COUNT(*) AS count_views
+FROM
+    events e
+        JOIN
+    page_hierarchy ph ON e.page_id = ph.page_id
+WHERE
+    e.event_type = 1
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
+````
+
+| page_name    | count_views     |
+| ------------ | --------------- |
+| All Products | 3174            |
+| Checkout     | 2103            |
+| Home Page    | 1782            |
