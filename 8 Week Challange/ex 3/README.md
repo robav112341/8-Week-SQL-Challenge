@@ -35,3 +35,31 @@ FROM
 | number_of_customers       |
 | ------------------------- |
 | 1000                      |
+
+**2. What is the monthly distribution of trial plan start_date values for our dataset?**
+
+````sql
+SELECT 
+    MONTHNAME(start_date) AS month_, COUNT(customer_id) AS count_customers
+FROM
+    subscriptions
+WHERE
+    plan_id = 0
+GROUP BY MONTH(start_date)
+ORDER BY MONTH(start_date);
+````
+
+| MONTH   | number_of_customers    |
+| ------- |  --------------------- |
+| January   |  88                  |
+| February  |  68                  |
+| March     |  94                  |
+| April     |  81                  |
+| May       |  88                  |
+| June      |  79                  |
+| July      |  89                  |
+| August    |  88                  |
+| September |  87                  |
+| October   |  79                  |
+| November  |  75                  |
+| December  |  84                  |
