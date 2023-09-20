@@ -332,3 +332,125 @@ LIMIT 1;
 | page_name      | count_abandoned           |
 | -------------- | ------------------------- |
 | Russian Caviar | 249                       |
+
+**3. Which product had the highest view to purchase percentage?**
+
+````sql
+WITH count_views AS(
+	SELECT 
+		page_id, COUNT(*) AS count_views
+	FROM
+		events
+	WHERE
+    event_type = 1
+	GROUP BY 1),
+count_add_cart as(
+	SELECT 
+		page_id, COUNT(*) AS count_cart
+	FROM
+		events
+	WHERE
+		event_type = 2
+	GROUP BY 1),
+count_purchase as(
+	WITH rank_events  AS (
+	SELECT
+		*
+	FROM
+		events
+	WHERE event_type BETWEEN 2 AND 3)
+	SELECT
+		page_id,
+		count(*) count_purchase
+	FROM
+		rank_events 
+	WHERE event_type = 2
+	AND visit_id IN (SELECT visit_id FROM rank_events where event_type = 3)
+	GROUP BY 1
+	ORDER BY 2 DESC)
+SELECT
+	ph.page_name, ROUND((cp.count_purchase/cv.count_views*100),1 ) AS view_to_purchase
+FROM
+	count_views cv
+JOIN 
+	count_add_cart cc ON cv.page_id = cc.page_id
+JOIN
+	count_purchase cp ON cv.page_id = cp.page_id
+JOIN
+	page_hierarchy ph ON cv.page_id = ph.page_id
+ORDER BY 2 DESC
+LIMIT 1;
+````
+
+| page_name | view_to_purchase |
+| --------- | ---------------- |
+| Lobster   | 48.7             |
+
+**4. -- What is the average conversion rate from view to cart add?**
+
+````sql
+WITH cte_views AS (
+	SELECT 
+		page_id, COUNT(*) AS count_views
+	FROM
+		events
+	WHERE
+		event_type = 1
+	GROUP BY 1),
+cte_addcart AS (
+	SELECT
+		page_id,COUNT(*) AS count_add
+	FROM
+		events
+	WHERE
+		event_type = 2
+	GROUP BY 1)
+SELECT
+	ROUND(AVG(ca.count_add/cv.count_views)*100,2) AS avg_view_to_cart
+FROM
+	cte_views cv 
+JOIN
+	cte_addcart ca
+ON
+	cv.page_id = ca.page_id;
+````
+
+| avg_view_to_cart |
+| --------------   |
+| 60.95            |
+
+**5. What is the average conversion rate from cart add to purchase?**
+
+````sql
+WITH cte_views AS (
+	SELECT 
+		page_id, COUNT(*) AS count_views
+	FROM
+		events
+	WHERE
+		event_type = 2
+	GROUP BY 1),
+cte_addcart AS (
+	SELECT
+		page_id,COUNT(*) AS count_add
+	FROM
+		events
+	WHERE
+		event_type = 2
+	AND visit_id IN (SELECT visit_id FROM events WHERE event_type = 3)
+	GROUP BY 1)
+SELECT
+	ROUND(AVG(ca.count_add/cv.count_views)*100,1) AS avg_cart_to_purch
+FROM
+	cte_views cv 
+JOIN
+	cte_addcart ca
+ON
+	cv.page_id = ca.page_id;
+
+
+````
+
+| avg_cart_to_purch |
+| ----------------- |
+| 75.9              |
