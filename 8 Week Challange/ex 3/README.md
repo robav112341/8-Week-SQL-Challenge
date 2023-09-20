@@ -160,3 +160,35 @@ ORDER BY 1;
 | pro annual    | 37                          | 3.7                           |
 | pro monthly   | 325                         | 32.5                          |
 
+**7. What is the customer count and percentage breakdown of all 5 plan_name values at 2020-12-31?**
+
+````sql
+WITH cte AS (
+	SELECT 
+		customer_id,
+		MAX(plan_id) AS max_plan,
+		MAX(start_date) AS max_date
+	FROM
+		subscriptions
+	WHERE
+		start_date < '2020-12-31'
+	GROUP BY customer_id)
+SELECT
+	p.plan_name,
+	COUNT(c.customer_id) as count,
+	ROUND(COUNT(c.customer_id)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions)*100,1) AS pracentage
+FROM
+	cte c
+JOIN 
+	plans p ON c.max_plan = p.plan_id
+GROUP BY max_plan
+ORDER BY 1;
+````
+
+| plan_name     | count           | pracentage |
+| ------------- | --------------- | ---------- |
+| basic monthly | 224             | 22.4       |
+| churn         | 235             | 23.5       |
+| pro annual    | 195             | 19.5       |
+| pro monthly   | 327             | 32.7       |
+| trial         | 19              | 1.9        |
