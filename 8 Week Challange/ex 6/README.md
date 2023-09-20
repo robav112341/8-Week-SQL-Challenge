@@ -245,3 +245,60 @@ LIMIT 3;
 | Crab      | 719                 |
 
 ### Product Funnel Analysis
+
+**1. Which product had the most views, cart adds and purchases?**
+
+````sql
+WITH count_views AS(
+	SELECT 
+		page_id, COUNT(*) AS count_views
+	FROM
+		events
+	WHERE
+		event_type = 1
+	GROUP BY 1),
+count_add_cart as(
+	SELECT 
+		page_id, COUNT(*) AS count_cart
+	FROM
+		events
+	WHERE
+		event_type = 2
+	GROUP BY 1),
+count_purchase as(
+	WITH rank_events  AS (
+		SELECT
+			*
+		FROM
+			events
+		WHERE event_type BETWEEN 2 AND 3)
+	SELECT
+		page_id,
+		count(*) count_purchase
+	FROM
+		rank_events 
+	WHERE event_type = 2
+	AND visit_id IN (SELECT visit_id FROM rank_events where event_type = 3)
+	GROUP BY 1
+	ORDER BY 2 DESC)
+SELECT
+	ph.page_name, cv.count_views, cc.count_cart, cp.count_purchase
+FROM
+	count_views cv
+JOIN 
+	count_add_cart cc ON cv.page_id = cc.page_id
+JOIN
+	count_purchase cp ON cv.page_id = cp.page_id
+JOIN
+	page_hierarchy ph ON cv.page_id = ph.page_id
+WHERE 
+	cv.count_views = (SELECT MAX(count_views) from count_views WHERE page_id BETWEEN 3 and 11)
+	OR cc.count_cart IN (SELECT MAX(count_cart) FROM count_add_cart)
+	OR cp.count_purchase IN (SELECT MAX(count_purchase) FROM count_purchase)
+    ORDER BY 2 DESC;
+````
+
+| page_name | count_views     | count_cart              | count_purchase      |
+| --------- | --------------- | ----------------------- | ------------------- |
+| Oyster    | 1568            | 943                     | 726                 |
+| Lobster   | 1547            | 968                     | 754                 |
