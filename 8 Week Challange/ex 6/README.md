@@ -386,7 +386,7 @@ LIMIT 1;
 | --------- | ---------------- |
 | Lobster   | 48.7             |
 
-**4. -- What is the average conversion rate from view to cart add?**
+**4. What is the average conversion rate from view to cart add?**
 
 ````sql
 WITH cte_views AS (
