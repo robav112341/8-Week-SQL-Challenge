@@ -107,3 +107,56 @@ WHERE
 | churn             | churn_percent    |
 | ----------------- | ---------------- |
 | 307               | 30.7             |
+
+**5. How many customers have churned straight after their initial free trial - what percentage is this rounded to the nearest whole number?**
+
+````sql
+WITH cte AS (
+	SELECT
+		customer_id,
+		plan_id AS current_plan,
+		LAG(plan_id,1) OVER(PARTITION BY customer_id) AS pre_plan
+    FROM
+		subscriptions)
+SELECT 
+	COUNT(*) AS churn_count,
+	ROUND(COUNT(*)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions)*100,1) AS churn_precentege
+FROM
+	cte
+WHERE current_plan = 4 AND pre_plan = 0;
+````
+
+| churn_count | churn_precentege |
+| ----------- | ---------------- |
+| 92          |     9.2          |
+
+**6. What is the number and percentage of customer plans after their initial free trial?**
+
+````sql
+WITH cte AS (
+	SELECT
+		customer_id,
+		plan_id AS current_plan,
+		LAG(plan_id,1) OVER(PARTITION BY customer_id) AS pre_plan
+    FROM
+		subscriptions)
+SELECT 
+	p.plan_name,
+	COUNT(*) AS count,
+	ROUND(COUNT(*)/(SELECT COUNT(DISTINCT customer_id) FROM subscriptions)*100,1) AS percentage_of_total  
+FROM
+	cte c
+JOIN
+	plans p ON c.current_plan = p.plan_id
+WHERE pre_plan = 0
+GROUP BY 1
+ORDER BY 1;
+````
+
+| plan_name     | count                       | percentage_of_total           |
+| ------------- | --------------------------- | ----------------------------- |
+| basic monthly | 546                         | 54.6                          |
+| churn         | 92                          | 9.2                           |
+| pro annual    | 37                          | 3.7                           |
+| pro monthly   | 325                         | 32.5                          |
+
