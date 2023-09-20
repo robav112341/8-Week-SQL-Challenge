@@ -87,3 +87,23 @@ ORDER BY s.plan_id ASC;
 | 2       | pro monthly   | 60               |
 | 3       | pro annual    | 63               |
 | 4       | churn         | 71               |
+
+**4. What is the customer count and percentage of customers who have churned rounded to 1 decimal place?**
+
+````sql
+SELECT 
+    COUNT(*) AS churn,
+    ROUND(COUNT(*) / (SELECT 
+                    COUNT(DISTINCT customer_id)
+                FROM
+                    subscriptions)*100,
+            1)  AS churn_precent
+FROM
+    subscriptions
+WHERE
+    plan_id = 4;
+````
+
+| churn             | churn_percent    |
+| ----------------- | ---------------- |
+| 307               | 30.7             |
