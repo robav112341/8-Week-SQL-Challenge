@@ -122,3 +122,32 @@ WHERE ct.ranks = 1;
 | B           | curry        | 2           |
 | B           | ramen        | 2           |
 | C           | ramen        | 3           |
+
+**6. Which item was purchased first by the customer after they became a member?**
+
+````sql
+WITH min_date AS (
+	SELECT 
+		s.customer_id, MIN(s.order_date) AS order_date
+	FROM
+		sales s
+	JOIN
+		members m ON s.customer_id = m.customer_id
+        AND s.order_date >= m.join_date
+	GROUP BY s.customer_id)
+SELECT
+	s.*,
+	m.product_name
+FROM
+	sales s
+JOIN min_date mn ON s.customer_id = mn.customer_id AND s.order_date = mn.order_date
+JOIN menu m ON s.product_id = m.product_id 
+ORDER BY s.customer_id;
+````
+
+| customer_id | order_date   | product_id  | product_name|
+| ----------- | ------------ | ----------  |-------------|
+| A           | 2021-01-07   | 2           |  curry      |
+| B           | 2021-01-11   | 1           |  sushi      |
+
+
