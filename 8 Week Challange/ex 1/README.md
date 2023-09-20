@@ -22,3 +22,19 @@ GROUP BY s.customer_id;
 | A           | 76          |
 | B           | 74          |
 | C           | 36          |
+
+**2. How many days has each customer visited the restaurant?**
+
+````sql
+SELECT 
+    customer_id, COUNT(DISTINCT order_date) AS num_of_days
+FROM
+    sales
+GROUP BY customer_id
+ORDER BY 1;
+````
+| customer_id | num_of_days |
+| ----------- | ----------- |
+| A           | 4           |
+| B           | 5           |
+| C           | 6           |
