@@ -187,3 +187,26 @@ WHERE if_null IS NULL;
 | ----------- | ------------ | -----------  |-------------|
 | A           | 2            |  curry       |  2021-01-01 |
 | B           | 1            |  sushi       |  2021-01-04 |
+
+**8. What is the total items and amount spent for each member before they became a member?**
+
+````sql
+SELECT 
+    s.customer_id,
+    COUNT(*) AS prod_num,
+    SUM(mn.price) AS sum_amount
+FROM
+    sales s
+        JOIN
+    members m ON s.customer_id = m.customer_id
+        AND s.order_date < m.join_date
+        JOIN
+    menu mn ON s.product_id = mn.product_id
+GROUP BY 1
+ORDER BY 1;
+````
+| customer_id | prod_num     | sum_amount   | 
+| ----------- | ------------ | -----------  |
+| A           | 2            |  25          |  
+| B           | 3            |  40          |
+
