@@ -7,7 +7,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 
 **1. What is the total amount each customer spent at the restaurant?**
 
-```ruby
+````sql
 SELECT 
     s.customer_id, SUM(m.price) AS total_spend
 FROM
@@ -15,4 +15,4 @@ FROM
         JOIN
     menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id;
-```
+````
