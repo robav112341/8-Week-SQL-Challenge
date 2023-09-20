@@ -192,3 +192,26 @@ ORDER BY 1;
 | pro annual    | 195             | 19.5       |
 | pro monthly   | 327             | 32.7       |
 | trial         | 19              | 1.9        |
+
+**8. How many customers have upgraded to an annual plan in 2020?**
+
+````sql
+WITH cte AS(
+	SELECT 
+		customer_id,
+		plan_id,
+		LAG(plan_id,1) OVER (PARTITION BY customer_id) as p_plan
+	FROM
+		subscriptions
+	WHERE  start_date < '2020-12-31')
+SELECT
+	(SELECT plan_name FROM plans WHERE plan_id = 3) as plan_name,
+	COUNT(*) count_annual_upgrades
+FROM
+	cte 
+WHERE plan_id = 3 AND p_plan IS NOT NULL;
+````
+
+| plan_name  | count_annual_upgrades |
+| ---------  | --------------------- |
+| pro annual |       195             |
