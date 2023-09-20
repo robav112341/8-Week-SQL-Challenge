@@ -306,3 +306,29 @@ WHERE
 ***:oyster: has most views: 1568 views**
 
 ***:lobster: has most cart adds: 968 and purchases: 754**
+
+**2. Which product was most likely to be abandoned?**
+
+````sql
+SELECT 
+    ph.page_name, COUNT(*) AS count_abandoned
+FROM
+    events e
+        JOIN
+    page_hierarchy ph ON e.page_id = ph.page_id
+WHERE
+    e.event_type = 2
+        AND e.visit_id NOT IN (SELECT DISTINCT
+            visit_id
+        FROM
+            events
+        WHERE
+            event_type = 3)
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+````
+
+| page_name      | count_abandoned           |
+| -------------- | ------------------------- |
+| Russian Caviar | 249                       |
