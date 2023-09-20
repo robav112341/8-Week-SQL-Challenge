@@ -38,3 +38,23 @@ ORDER BY 1;
 | A           | 4           |
 | B           | 5           |
 | C           | 6           |
+
+**3. What was the first item from the menu purchased by each customer?**
+
+````sql
+SELECT 
+    s.customer_id,
+    MIN(s.order_date) AS first_purch,
+    m.product_name
+FROM
+    sales s
+        JOIN
+    menu m ON s.product_id = m.product_id
+GROUP BY customer_id;
+````
+
+| customer_id | first_purch | product_name|
+| ----------- | ------------| ----------  |
+| A           | 2021-01-01  | sushi       |
+| B           | 2021-01-01  | curry       |
+| C           | 2021-01-01  | ramen       |
