@@ -16,3 +16,9 @@ FROM
     menu m ON s.product_id = m.product_id
 GROUP BY s.customer_id;
 ````
+
+| customer_id | total_spend |
+| ----------- | ----------- |
+| A           | 76          |
+| B           | 74          |
+| C           | 36          |
