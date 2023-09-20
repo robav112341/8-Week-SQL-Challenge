@@ -22,5 +22,16 @@ This case study focuses on using subscription style digital data to answer impor
 
 ## Case Study Questions
 
-**A. Customer Journey**
-**
+**Data Analysis Questions**
+**1. How many customers has Foodie-Fi ever had?**
+
+````sql
+SELECT 
+    COUNT(DISTINCT customer_id) AS number_of_customers
+FROM
+    subscriptions;
+````
+
+| number_of_customers       |
+| ------------------------- |
+| 1000                      |
