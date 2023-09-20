@@ -6,3 +6,13 @@ Danny wants to use the data to answer a few simple questions about his customers
 ## Case Study Questions
 
 **1. What is the total amount each customer spent at the restaurant?**
+
+```ruby
+SELECT 
+    s.customer_id, SUM(m.price) AS total_spend
+FROM
+    sales s
+        JOIN
+    menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id;
+```
