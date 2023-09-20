@@ -20,6 +20,4 @@ Clique Bait is not like your regular online seafood store - the founder and CEO 
 
 In this case study - you are required to support Danny’s vision and analyse his dataset and come up with creative solutions to calculate funnel fallout rates for the Clique Bait online store.
 
-Full description: [Case Study #6 - Clique Bait](https://8weeksqlchallenge.com/case-study-6/)
-
 ## Case Study Questions
