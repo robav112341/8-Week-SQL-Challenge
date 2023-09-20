@@ -21,7 +21,7 @@ Clique Bait is not like your regular online seafood store - the founder and CEO 
 In this case study - you are required to support Danny’s vision and analyse his dataset and come up with creative solutions to calculate funnel fallout rates for the Clique Bait online store.
 
 ## Case Study Questions
-**Digital Analysis**
+# Digital Analysis
 
 **1. How many users are there?**
 
@@ -243,3 +243,5 @@ LIMIT 3;
 | Lobster   | 754                 |
 | Oyster    | 726                 |
 | Crab      | 719                 |
+
+# Product Funnel Analysis
