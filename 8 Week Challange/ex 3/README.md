@@ -215,3 +215,29 @@ WHERE plan_id = 3 AND p_plan IS NOT NULL;
 | plan_name  | count_annual_upgrades |
 | ---------  | --------------------- |
 | pro annual |       195             |
+
+**9. How many days on average does it take for a customer to an annual plan from the day they join Foodie-Fi?**
+
+````sql
+ WITH min_date AS (
+	SELECT 
+		customer_id,
+		MIN(start_date) AS min_date
+	FROM
+		subscriptions
+	GROUP BY customer_id),
+now_date AS (
+	SELECT 
+		customer_id, 
+		start_date AS now_date 
+    FROM subscriptions 
+    WHERE plan_id = 3)
+SELECT
+	(SELECT plan_name FROM plans WHERE plan_id = 3) as plan_name,	
+	ROUND(AVG(nd.now_date - md.min_date),0) AS time_AVG
+FROM now_date nd
+JOIN min_date md ON nd.customer_id = md.customer_id;
+````
+| plan_name  | time_AVG                |
+| ---------- | ----------------------- |
+| pro annual | 105                     |
