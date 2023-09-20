@@ -168,3 +168,78 @@ LIMIT 3;
 | All Products | 3174            |
 | Checkout     | 2103            |
 | Home Page    | 1782            |
+
+**8. What is the number of views and cart adds for each product category?**
+
+````sql
+WITH count_views AS (
+	SELECT 
+		page_id, COUNT(*) AS count_views
+	FROM
+		EVENTS
+	WHERE
+		page_id BETWEEN 3 AND 12
+			AND event_type = 1
+	GROUP BY page_id),
+count_add_cart AS ( 
+	SELECT 
+		page_id, COUNT(*) AS count_add_cart
+	FROM
+		EVENTS
+	WHERE
+		page_id BETWEEN 3 AND 12
+			AND event_type = 2
+	GROUP BY 1),
+final_table AS (
+	SELECT
+		cv.page_id, cv.count_views,cc.count_add_cart
+	FROM
+		count_views cv 
+	JOIN
+		count_add_cart cc 
+	ON cv.page_id = cc.page_id
+	ORDER BY 1)
+SELECT
+	ph.product_category, SUM(ft.count_views) AS views, SUM(ft.count_add_cart) AS add_cart
+FROM
+	final_table ft
+JOIN
+	page_hierarchy ph ON ft.page_id = ph.page_id
+GROUP BY 1;
+````
+
+| product_category | views      | add_cart |
+| ---------------- | --------   | -------- |
+| Fish             | 4633       | 2789     |
+| Luxury           | 3032       | 1870     |
+| Shellfish        | 6204       | 3792     |
+
+
+**9. What are the top 3 products by purchases?
+
+````sql
+WITH rank_events  AS (
+	SELECT
+		*
+	FROM
+		events
+	WHERE event_type BETWEEN 2 AND 3)
+SELECT
+	ph.page_name,
+	count(*) AS count_sales
+FROM
+	rank_events re
+JOIN
+	page_hierarchy ph ON re.page_id = ph.page_id
+WHERE event_type = 2
+AND visit_id IN (SELECT visit_id FROM rank_events where event_type = 3)
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
+````
+
+| page_name | count_sales         |
+| --------- | ------------------- |
+| Lobster   | 754                 |
+| Oyster    | 726                 |
+| Crab      | 719                 |
