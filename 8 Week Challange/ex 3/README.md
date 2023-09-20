@@ -1,5 +1,5 @@
 # 🥑 Case Study #3: Foodie-Fi 
-<img src="https://user-images.githubusercontent.com/81607668/127727503-9d9e7a25-93cb-4f95-8bd0-20b87cb4b459.png" alt="Image" width="500" height="520">
+<img src="https://user-images.githubusercontent.com/81607668/129742132-8e13c136-adf2-49c4-9866-dec6be0d30f0.png" width="500" height="520" alt="image">
 
 ## 📚 Table of Contents
 - [Business Task](#problem-statement)
