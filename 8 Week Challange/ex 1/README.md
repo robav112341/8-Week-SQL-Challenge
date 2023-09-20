@@ -7,7 +7,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 
 **1. What is the total amount each customer spent at the restaurant?**
 
-```RUBY
+```ruby
 SELECT 
     s.customer_id, SUM(m.price) AS total_spend
 FROM
