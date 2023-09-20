@@ -13,7 +13,7 @@ FROM
 -- Question 2:
 -- How many cookies does each user have on average?
 SELECT 
-    COUNT(*) / COUNT(DISTINCT user_id) AS avg_per_user
+    ROUND(COUNT(*) / COUNT(DISTINCT user_id),2) AS avg_per_user
 FROM
     USERS
 ;
@@ -48,7 +48,7 @@ SELECT
                     COUNT(DISTINCT visit_id)
                 FROM
                     events) * 100,
-            1) AS precentage
+            1) AS percentage
 FROM
     events e
         JOIN
@@ -65,7 +65,7 @@ SELECT
                     COUNT(DISTINCT visit_id)
                 FROM
                     events) * 100,
-            1) AS precentage
+            1) AS percentage
 FROM
     events e
         JOIN
@@ -142,7 +142,7 @@ WITH rank_events  AS (
 	WHERE event_type BETWEEN 2 AND 3)
 SELECT
 	ph.page_name,
-	count(*)
+	count(*) count_sales
 FROM
 	rank_events re
 JOIN
@@ -201,12 +201,13 @@ JOIN
 WHERE 
 	cv.count_views = (SELECT MAX(count_views) from count_views WHERE page_id BETWEEN 3 and 11)
 	OR cc.count_cart IN (SELECT MAX(count_cart) FROM count_add_cart)
-	OR cp.count_purchase IN (SELECT MAX(count_purchase) FROM count_purchase);
+	OR cp.count_purchase IN (SELECT MAX(count_purchase) FROM count_purchase)
+    ORDER BY 2 DESC;
 
 -- Question 2:
 -- Which product was most likely to be abandoned?
 SELECT 
-    ph.page_name, COUNT(*)
+    ph.page_name, COUNT(*) AS count_abandoned
 FROM
     events e
         JOIN
@@ -317,11 +318,10 @@ cte_addcart AS (
 	AND visit_id IN (SELECT visit_id FROM events WHERE event_type = 3)
 	GROUP BY 1)
 SELECT
-	ROUND(AVG(ca.count_add/cv.count_views)*100,1) AS avg_view_to_cart
+	ROUND(AVG(ca.count_add/cv.count_views)*100,1) AS avg_cart_to_purch
 FROM
 	cte_views cv 
 JOIN
 	cte_addcart ca
 ON
 	cv.page_id = ca.page_id;
-
