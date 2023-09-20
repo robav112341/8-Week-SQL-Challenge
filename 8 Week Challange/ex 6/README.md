@@ -70,3 +70,48 @@ ORDER BY event_time;
 | March     | 916           |
 | April     | 248           |
 | May       | 36            |
+
+**4. What is the number of events for each event type?**
+
+````sql
+SELECT 
+    ei.event_name, COUNT(*) AS count_events
+FROM
+    events e
+        JOIN
+    event_identifier ei ON e.event_type = ei.event_type
+GROUP BY e.event_type;
+````
+
+| event_name    | count_events     |
+| ------------- | ---------------- |
+| Page View     | 20928            |
+| Add to Cart   | 8451             |
+| Purchase      | 1777             |
+| Ad Impression | 876              |
+| Ad Click      | 702              |
+
+**5. What is the percentage of visits which have a purchase event?**
+
+````sql
+SELECT 
+    e.event_type,
+    ei.event_name,
+    COUNT(DISTINCT visit_id) AS count_type3,
+    ROUND(COUNT(*) / (SELECT 
+                    COUNT(DISTINCT visit_id)
+                FROM
+                    events) * 100,
+            1) AS percentage
+FROM
+    events e
+        JOIN
+    event_identifier ei ON e.event_type = ei.event_type
+WHERE
+    e.event_type = 3
+GROUP BY 1;
+````
+
+| event_type | event_name | count_type 3 | percentage |
+| ---------- | ---------- | ------------ | ---------- |
+|     3      |  Purchase  |    1777      |   49.9     |
