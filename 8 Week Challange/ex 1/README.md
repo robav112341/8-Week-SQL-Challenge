@@ -150,4 +150,40 @@ ORDER BY s.customer_id;
 | A           | 2021-01-07   | 2           |  curry      |
 | B           | 2021-01-11   | 1           |  sushi      |
 
+**7. Which item was purchased just before the customer became a member?**
 
+````sql
+WITH max_date AS (
+	SELECT 
+		s.customer_id, 
+		MAX(s.order_date) AS order_date
+	FROM
+		sales s
+	JOIN
+		members m ON s.customer_id = m.customer_id
+        AND s.order_date < m.join_date
+	GROUP BY s.customer_id),
+rank_table AS (	
+	SELECT
+		s.*,
+		m.product_name,
+		ROW_NUMBER() OVER (PARTITION BY s.customer_id ) AS row_num,
+		LEAD(s.order_date) OVER (PARTITION BY s.customer_id) AS if_null
+	FROM
+		sales s
+	JOIN max_date md ON s.customer_id = md.customer_id AND s.order_date = md.order_date
+	JOIN menu m ON s.product_id = m.product_id )
+SELECT
+    customer_id,
+    product_id,
+    product_name,
+    order_date
+FROM
+    rank_table
+WHERE if_null IS NULL;
+````
+
+| customer_id | product_id   | product_name | order_date  |
+| ----------- | ------------ | -----------  |-------------|
+| A           | 2            |  curry       |  2021-01-01 |
+| B           | 1            |  sushi       |  2021-01-04 |
