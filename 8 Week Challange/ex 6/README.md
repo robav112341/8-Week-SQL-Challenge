@@ -302,3 +302,7 @@ WHERE
 | --------- | --------------- | ----------------------- | ------------------- |
 | Oyster    | 1568            | 943                     | 726                 |
 | Lobster   | 1547            | 968                     | 754                 |
+
+***:oyster: has most views: 1568 views**
+
+***:lobster: has most cart adds: 968 and purchases: 754**
