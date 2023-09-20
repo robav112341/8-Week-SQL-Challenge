@@ -210,3 +210,104 @@ ORDER BY 1;
 | A           | 2            |  25          |  
 | B           | 3            |  40          |
 
+**9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+
+````sql
+SELECT 
+    s.customer_id,
+    COUNT(*) AS count_orders,
+    SUM(CASE
+        WHEN m.product_name = 'sushi' THEN m.price * 20
+        ELSE m.price*10
+    END) AS points
+FROM
+    sales s
+        JOIN
+    menu m ON s.product_id = m.product_id
+GROUP BY 1;
+````
+
+| customer_id | count_orders | points    | 
+| ----------- | ------------ | --------  |
+| A           | 6            |  860      |  
+| B           | 6            |  940      |
+| C           | 3            |  360      |
+
+**10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?**
+
+````sql
+SELECT 
+    s.customer_id,
+    COUNT(*) AS count_orders,
+    SUM(CASE
+        WHEN
+            s.order_date >= m.join_date
+                AND s.order_date < DATE_ADD(m.join_date, INTERVAL 7 DAY)
+                AND mn.product_name != 'sushi'
+        THEN
+            mn.price * 20
+        WHEN mn.product_name = 'sushi' THEN mn.price * 20
+        ELSE mn.price * 10
+    END) AS points
+FROM
+    sales s
+        JOIN
+    menu mn ON s.product_id = mn.product_id
+        JOIN
+    members m ON s.customer_id = m.customer_id
+GROUP BY 1
+ORDER BY 1;
+````
+
+| customer_id | count_orders | points    | 
+| ----------- | ------------ | --------  |
+| A           | 6            |  1370     |  
+| B           | 6            |  940      |
+
+**Bonus Questions**
+
+Join All Things:
+
+````sql
+SELECT 
+    s.customer_id,
+    s.order_date,
+    mn.product_name,
+    mn.price,
+    (SELECT 
+            CASE
+                    WHEN
+                        s.customer_id = m.customer_id
+                            AND s.order_date >= m.join_date
+                    THEN
+                        'Y'
+                    ELSE 'N'
+                END
+        ) AS membership
+FROM
+    sales s
+        LEFT JOIN
+    members m ON s.customer_id = m.customer_id
+        JOIN
+    menu mn ON s.product_id = mn.product_id
+ORDER BY 1 , 3, 2;
+````
+
+| customer_id | order_date | product_name | price | member |
+| ----------- | ---------- | ------------ | ----- | ------ |
+| A           | 2021-01-01 | curry        | 15    | N      |
+| A           | 2021-01-07 | curry        | 15    | Y      |
+| A           | 2021-01-10 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | ramen        | 12    | Y      |
+| A           | 2021-01-11 | sushi        | 10    | N      |
+| B           | 2021-01-01 | curry        | 15    | N      |
+| B           | 2021-01-02 | curry        | 15    | N      |
+| B           | 2021-01-16 | ramen        | 12    | Y      |
+| B           | 2021-02-01 | ramen        | 12    | Y      |
+| B           | 2021-01-04 | sushi        | 10    | N      |
+| B           | 2021-01-11 | sushi        | 10    | Y      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-01 | ramen        | 12    | N      |
+| C           | 2021-01-07 | ramen        | 12    | N      |
+
