@@ -371,3 +371,73 @@ WHERE ranks = 1;
 |Blue Polo Shirt - Mens	        |3819	|217683	        |26819.1	|Mens         |
 |Grey Fashion Jacket - Womens	|3876	|209304	        |25391.9	|Womens       |
 
+**6. What is the percentage split of revenue by product for each segment?**
+
+```sql
+SELECT 
+    pd.segment_name,
+    pd.product_name,
+    SUM(s.qty * s.price) AS revenue,
+    ROUND(SUM(s.qty * s.price) / (SELECT 
+                    SUM(x.qty * x.price)
+                FROM
+                    sales x
+                        JOIN
+                    product_details px ON x.prod_id = px.product_id
+                WHERE
+                    px.segment_id = pd.segment_id)*100,
+            1) AS precentage
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 2
+ORDER BY 1, 3 DESC;
+```
+
+| segment_name | product_name                     | precentage         |
+| ------------ | -------------------------------- | ------------------ |
+| Jacket       | Grey Fashion Jacket - Womens     | 57.0               |
+| Jacket       | Khaki Suit Jacket - Womens       | 23.5               |
+| Jacket       | Indigo Rain Jacket - Womens      | 19.5               |
+| Jeans        | Black Straight Jeans - Womens    | 58.1               |
+| Jeans        | Navy Oversized Jeans - Womens    | 24.1               |
+| Jeans        | Cream Relaxed Jeans - Womens     | 17.8               |
+| Shirt        | Blue Polo Shirt - Mens           | 53.6               |
+| Shirt        | White Tee Shirt - Mens           | 37.4               |
+| Shirt        | Teal Button Up Shirt - Mens      | 9.0                |
+| Socks        | Navy Solid Socks - Mens          | 44.3               |
+| Socks        | Pink Fluro Polkadot Socks - Mens | 35.5               |
+| Socks        | White Striped Socks - Mens       | 20.2               |
+
+**7. What is the percentage split of revenue by segment for each category?**
+
+```sql
+SELECT 
+    pd.category_name,
+    pd.segment_name,
+    SUM(s.qty * s.price) AS revenue,
+    ROUND(SUM(s.qty * s.price) / (SELECT 
+                    SUM(x.qty * x.price)
+                FROM
+                    sales x
+                        JOIN
+                    product_details y ON x.prod_id = y.product_id
+                WHERE
+                    y.category_name = pd.category_name)*100,
+            1) AS precentage
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 2
+ORDER BY 1;
+```
+
+|category_name	|segment_name	|revenue	|precentage|
+| ------------- | ------------- | ------------- | ---------|
+|Mens   	|Shirt  	|406143 	|56.9      | 
+|Mens   	|Socks  	|307977 	|43.1      |
+|Womens  	|Jeans  	|208350 	|36.2      |
+|Womens 	|Jacket 	|366983 	|63.8      |
+
