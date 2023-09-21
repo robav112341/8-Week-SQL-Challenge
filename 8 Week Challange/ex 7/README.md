@@ -441,3 +441,146 @@ ORDER BY 1;
 |Womens  	|Jeans  	|208350 	|36.2      |
 |Womens 	|Jacket 	|366983 	|63.8      |
 
+**8. What is the percentage split of total revenue by category?**
+
+```sql
+SELECT 
+    pd.category_name,
+    SUM(s.qty * s.price) AS revenue,
+    ROUND(SUM(s.qty * s.price) / (SELECT 
+                    SUM(qty * price)
+                FROM
+                    sales)*100,
+            1) AS precentage
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1;
+```
+
+|category_name	|revenue	|precentage |
+| ------------- | ------------- | --------- |
+|Womens 	|575333 	|44.6       |
+|Mens   	|714120 	|55.4       |
+
+**9. -- What is the total transaction “penetration” for each product?**
+
+```sql
+WITH ranked_sales  AS(
+	SELECT 
+		*,
+		RANK() OVER(PARTITION BY prod_id ORDER BY qty) AS ranks
+	FROM
+		sales),
+prod_count AS (
+	SELECT 
+		*,
+		COUNT(*) as count_p
+	FROM
+		ranked_sales 
+	WHERE
+		ranks >= 1
+	GROUP BY prod_id)
+SELECT
+	pd.product_name,
+	ROUND(pc.count_p/(SELECT COUNT(DISTINCT txn_id) FROM sales)*100,2) AS p
+FROM	
+	prod_count pc
+JOIN
+	product_details pd ON pc.prod_id = pd.product_id
+ORDER BY 2 DESC;
+```
+
+| product_name                     |            p           |
+| -------------------------------- | ---------------------- |
+| Navy Solid Socks - Mens          | 51.24                  |
+| Grey Fashion Jacket - Womens     | 51.00                  |
+| Navy Oversized Jeans - Womens    | 50.96                  |
+| White Tee Shirt - Mens           | 50.72                  |
+| Blue Polo Shirt - Mens           | 50.72                  |
+| Pink Fluro Polkadot Socks - Mens | 50.32                  |
+| Indigo Rain Jacket - Womens      | 50.00                  |
+| Khaki Suit Jacket - Womens       | 49.88                  |
+| Black Straight Jeans - Womens    | 49.84                  |
+| White Striped Socks - Mens       | 49.72                  |
+| Cream Relaxed Jeans - Womens     | 49.72                  |
+| Teal Button Up Shirt - Mens      | 49.68                  |
+
+
+**10. What is the most common combination of at least 1 quantity of any 3 products in a 1 single transaction?**
+
+```
+Sorry, I do not fully understand the output required.
+```
+
+### Bonus Challange:
+
+Use a single SQL query to transform the product_hierarchy and product_prices datasets to the product_details table.
+
+```sql
+WITH part_one AS(
+	SELECT 
+		pp.product_id,
+		pp.price,
+		ph.id AS style_id,
+		(SELECT 
+            id
+        FROM
+            product_hierarchy
+        WHERE
+            id = ph.parent_id) AS segment_id,
+		(SELECT 
+            level_text
+        FROM
+            product_hierarchy
+        WHERE
+            id = ph.parent_id) AS segment_name,
+		ph.level_text AS style_name
+	FROM
+		product_prices pp
+	JOIN
+		product_hierarchy ph ON pp.id = ph.id),
+part_two AS(
+	SELECT
+		product_id,
+		price,
+        (SELECT parent_id FROM product_hierarchy WHERE level_text = segment_name) as category_id,
+        style_id,
+        segment_id,
+        segment_name,
+        (SELECT level_text FROM product_hierarchy WHERE id = (SELECT parent_id FROM product_hierarchy WHERE level_text = segment_name)) as category_name,
+        style_name
+	FROM
+		part_one)
+	SELECT
+    product_id,
+    price,
+    CONCAT(style_name,' ',segment_name,' - ',category_name) AS product_name,
+    category_id,
+    segment_id,
+	style_id,
+    category_name,
+    segment_name,
+    style_name
+FROM 
+    part_two;
+```
+
+| product_id | price | product_name                     | category_id | segment_id | style_id | category_name | segment_name | style_name          |
+| ---------- | ----- | -------------------------------- | ----------- | ---------- | -------- | ------------- | ------------ | ------------------- |
+| c4a632     | 13    | Navy Oversized Jeans - Womens    | 1           | 3          | 7        | Womens        | Jeans        | Navy Oversized      |
+| e83aa3     | 32    | Black Straight Jeans - Womens    | 1           | 3          | 8        | Womens        | Jeans        | Black Straight      |
+| e31d39     | 10    | Cream Relaxed Jeans - Womens     | 1           | 3          | 9        | Womens        | Jeans        | Cream Relaxed       |
+| d5e9a6     | 23    | Khaki Suit Jacket - Womens       | 1           | 4          | 10       | Womens        | Jacket       | Khaki Suit          |
+| 72f5d4     | 19    | Indigo Rain Jacket - Womens      | 1           | 4          | 11       | Womens        | Jacket       | Indigo Rain         |
+| 9ec847     | 54    | Grey Fashion Jacket - Womens     | 1           | 4          | 12       | Womens        | Jacket       | Grey Fashion        |
+| 5d267b     | 40    | White Tee Shirt - Mens           | 2           | 5          | 13       | Mens          | Shirt        | White Tee           |
+| c8d436     | 10    | Teal Button Up Shirt - Mens      | 2           | 5          | 14       | Mens          | Shirt        | Teal Button Up      |
+| 2a2353     | 57    | Blue Polo Shirt - Mens           | 2           | 5          | 15       | Mens          | Shirt        | Blue Polo           |
+| f084eb     | 36    | Navy Solid Socks - Mens          | 2           | 6          | 16       | Mens          | Socks        | Navy Solid          |
+| b9a74d     | 17    | White Striped Socks - Mens       | 2           | 6          | 17       | Mens          | Socks        | White Striped       |
+| 2feb6b     | 29    | Pink Fluro Polkadot Socks - Mens | 2           | 6          | 18       | Mens          | Socks        | Pink Fluro Polkadot |
+
+
+
