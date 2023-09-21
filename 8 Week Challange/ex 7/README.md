@@ -21,3 +21,31 @@ Balanced Tree Clothing Company prides themselves on providing an optimised range
 Danny, the CEO of this trendy fashion company has asked you to assist the team’s merchandising teams analyse their sales performance and generate a basic financial report to share with the wider business.
 
 ## Case Study Questions
+
+### 📈 A. High Level Sales Analysis
+
+**1. 1. What was the total quantity sold for all products?
+
+```sql
+SELECT 
+    pd.product_name, SUM(s.qty) AS total_qty
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1;
+```
+
+| product_name                   | total_qty |
+| ------------------------------ | --------- |
+| White Striped Socks - Mens     |	3655     |
+|Pink Fluro Polkadot Socks - Mens|  3770     |
+|Cream Relaxed Jeans - Womens	   |  3707     |
+|Indigo Rain Jacket - Womens     |  3757     |
+|Blue Polo Shirt - Mens          |	3819     |
+|Navy Solid Socks - Mens	       |  3792     |
+|Black Straight Jeans - Womens   |	3786     |
+|Khaki Suit Jacket - Womens	     |  3752     |
+|Grey Fashion Jacket - Womens	   |  3876     |
+|Teal Button Up Shirt - Mens	   |  3646     |
+
