@@ -319,3 +319,55 @@ WHERE ranks = 1;
 |Blue Polo Shirt - Mens	        |3819	|217683	|26819.1       |Shirt       |       
 |Navy Solid Socks - Mens	|3792	|136512	|16650.4       |Socks       |
 
+**4. What is the total quantity, revenue and discount for each category?**
+
+```sql
+SELECT 
+    pd.category_name,
+    SUM(s.qty) AS qty,
+    SUM(s.price * s.qty) AS revenue,
+    ROUND(SUM(s.price * s.qty * (s.discount / 100)),
+            1) AS total_discount
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1
+ORDER BY 1;
+```
+
+| category_name |   qty          |    revenue    | total_discount |
+| ------------- | -------------- | ------------- | -------------- |
+| Mens          | 22482          | 714120        | 86607.71       |
+| Womens        | 22734          | 575333        | 69621.43       |
+
+**5. What is the top selling product for each category?**
+
+```sql
+WITH ranked_product AS (
+	SELECT 
+		pd.product_name,
+		SUM(s.qty) AS qty,
+		SUM(s.price * s.qty) AS revenue,
+		ROUND(SUM(s.price * s.qty * (s.discount / 100)),
+				1) AS total_discount,
+		pd.category_name,
+		rank() OVER(PARTITION BY pd.category_name ORDER BY SUM(s.price * s.qty) DESC) AS ranks
+	FROM
+		sales s
+	JOIN
+		product_details pd ON s.prod_id = pd.product_id
+	GROUP BY 1
+	ORDER BY 5)
+SELECT
+	product_name,qty,revenue,total_discount,category_name
+FROM
+	ranked_product
+WHERE ranks = 1;
+```
+
+|product_name	                |qty	|revenue	|total_discount	|category_name|
+| ----------------------------- | ----- | ------------- | ------------- | ----------- |
+|Blue Polo Shirt - Mens	        |3819	|217683	        |26819.1	|Mens         |
+|Grey Fashion Jacket - Womens	|3876	|209304	        |25391.9	|Womens       |
+
