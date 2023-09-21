@@ -164,3 +164,22 @@ GROUP BY 2;
 |   647	  | 0.75  |
 |   1134  | 1     |
 
+**3. What is the average discount value per transaction?**
+
+```sql
+WITH txn_discount AS(
+	SELECT 
+		txn_id,
+		ROUND(SUM(qty * price * (discount / 100)), 1) AS discount
+	FROM
+		sales
+	GROUP BY 1)
+SELECT
+	ROUND(AVG(discount),1) avg_discount_per_txn
+FROM
+	txn_discount;
+```
+
+| avg_discount_per_txn |
+| -------------------- |
+|       62.5           |
