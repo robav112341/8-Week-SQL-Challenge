@@ -24,7 +24,7 @@ Danny, the CEO of this trendy fashion company has asked you to assist the teamâ€
 
 ### ðŸ“ˆ A. High Level Sales Analysis
 
-**1. 1. What was the total quantity sold for all products?
+**1. What was the total quantity sold for all products?**
 
 ```sql
 SELECT 
@@ -36,16 +36,43 @@ FROM
 GROUP BY 1;
 ```
 
-| product_name                   | total_qty |
-| ------------------------------ | --------- |
-| White Striped Socks - Mens     |	3655     |
-|Pink Fluro Polkadot Socks - Mens|  3770     |
+| product_name                     | total_qty |
+| ------------------------------   | --------- |
+|White Striped Socks - Mens        |  3655     |
+|Pink Fluro Polkadot Socks - Mens  |  3770     |
 |Cream Relaxed Jeans - Womens	   |  3707     |
-|Indigo Rain Jacket - Womens     |  3757     |
-|Blue Polo Shirt - Mens          |	3819     |
+|Indigo Rain Jacket - Womens       |  3757     |
+|Blue Polo Shirt - Mens            |  3819     |
 |Navy Solid Socks - Mens	       |  3792     |
-|Black Straight Jeans - Womens   |	3786     |
-|Khaki Suit Jacket - Womens	     |  3752     |
+|Black Straight Jeans - Womens     |  3786     |
+|Khaki Suit Jacket - Womens	       |  3752     |
 |Grey Fashion Jacket - Womens	   |  3876     |
 |Teal Button Up Shirt - Mens	   |  3646     |
+
+**2. What is the total generated revenue for all products before discounts?**
+
+```sql
+SELECT 
+    pd.product_name,SUM(s.qty * s.price) AS total_revenue
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1;
+```
+|         product_name           | total_revenue |
+| ------------------------------ | ------------- |
+|Navy Oversized Jeans - Womens   |	    50128    |
+|White Tee Shirt - Mens          |	    152000   |
+|White Striped Socks - Mens      |	    62135    |
+|Pink Fluro Polkadot Socks - Mens|	    109330   |
+|Cream Relaxed Jeans - Womens    |	    37070    |
+|Indigo Rain Jacket - Womens     |	    71383    |
+|Blue Polo Shirt - Mens          |	    217683   |
+|Navy Solid Socks - Mens         |	    136512   |
+|Black Straight Jeans - Womens   |	    121152   |
+|Khaki Suit Jacket - Womens      |	    86296    |
+|Grey Fashion Jacket - Womens    |	    209304   |
+|Teal Button Up Shirt - Mens     |  	36460    |
+
 
