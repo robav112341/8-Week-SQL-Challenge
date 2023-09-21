@@ -242,3 +242,47 @@ FROM
 |f       |515.0    |
 
 ### 👚 C. Product Analysis
+
+**1. What are the top 3 products by total revenue before discount?**
+
+```sql
+SELECT 
+    pd.product_name, SUM(s.qty * s.price) AS total_revenue
+FROM
+    sales s
+        JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
+```
+
+| product_name                 | total_revenue |
+| ---------------------------- | ------------- |
+| Blue Polo Shirt - Mens       | 217683        |
+| Grey Fashion Jacket - Womens | 209304        |
+| White Tee Shirt - Mens       | 152000        |
+
+**2. What is the total quantity, revenue and discount for each segment?**
+
+```sql
+SELECT 
+    pd.segment_name,
+    SUM(s.qty) AS qty,
+    SUM(s.price * s.qty) AS revenue,
+    ROUND(SUM(s.price * s.qty * (s.discount / 100)),
+            1) AS total_discount
+FROM
+    sales s
+JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1
+ORDER BY 1;
+```
+
+| segment_name | qty            |    revenue    | total_discount |
+| ------------ | -------------- | ------------- | -------------- |
+| Jacket       | 11385          | 366983        | 44277.5       |
+| Jeans        | 11349          | 208350        | 25344.0       |
+| Shirt        | 11265          | 406143        | 49594.3       |
+| Socks        | 11217          | 307977        | 37013.4      |
