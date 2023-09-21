@@ -282,7 +282,40 @@ ORDER BY 1;
 
 | segment_name | qty            |    revenue    | total_discount |
 | ------------ | -------------- | ------------- | -------------- |
-| Jacket       | 11385          | 366983        | 44277.5       |
-| Jeans        | 11349          | 208350        | 25344.0       |
-| Shirt        | 11265          | 406143        | 49594.3       |
-| Socks        | 11217          | 307977        | 37013.4      |
+| Jacket       | 11385          | 366983        | 44277.5        |
+| Jeans        | 11349          | 208350        | 25344.0        |
+| Shirt        | 11265          | 406143        | 49594.3        |
+| Socks        | 11217          | 307977        | 37013.4        |
+
+**3. What is the top selling product for each segment?**
+
+```sql
+WITH rank_product AS(
+	SELECT 
+		pd.product_name,
+		SUM(s.qty) AS qty,
+		SUM(s.price * s.qty) AS revenue,
+		ROUND(SUM(s.price * s.qty * (s.discount / 100)),
+				1) AS total_discount,
+		pd.segment_name,
+		rank() OVER(PARTITION BY pd.segment_name ORDER BY SUM(s.price * s.qty) DESC) AS ranks
+	FROM
+		sales s
+	JOIN
+		product_details pd ON s.prod_id = pd.product_id
+	GROUP BY 1
+	ORDER BY 5)
+SELECT
+	product_name,qty,revenue,total_discount,segment_name
+FROM
+	rank_product
+WHERE ranks = 1;
+```
+
+|product_name	                |qty	|revenue|total_discount|segment_name|
+| ----------------------------- | ----- | ----- | ------------ | ---------- |
+|Grey Fashion Jacket - Womens	|3876	|209304	|25391.9       |Jacket      |
+|Black Straight Jeans - Womens	|3786	|121152	|14745.0       |Jeans       |
+|Blue Polo Shirt - Mens	        |3819	|217683	|26819.1       |Shirt       |       
+|Navy Solid Socks - Mens	|3792	|136512	|16650.4       |Socks       |
+
