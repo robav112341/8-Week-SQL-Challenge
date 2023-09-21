@@ -118,7 +118,7 @@ FROM
 | --------- |
 |   2500    |
 
-**1. What is the average unique products purchased in each transaction?**
+**2. What is the average unique products purchased in each transaction?**
 
 ```sql
 WITH unique_count AS 
@@ -136,3 +136,31 @@ FROM
 | avg_product_per_txn |
 | ------------------- |
 |         6.0         |
+
+
+**3. What are the 25th, 50th and 75th percentile values for the revenue per transaction?**
+
+```sql
+WITH txn_revenue AS
+(	SELECT 
+		ROW_NUMBER() OVER(ORDER BY txn_id) AS txn_num
+		,txn_id, SUM(price * qty) AS revenue,
+		ROUND(percent_rank() OVER (ORDER BY SUM(price * qty)),2) p
+	FROM
+		sales
+	GROUP BY 2)
+SELECT
+	ROUND(AVG(revenue)) as revenue,
+	p
+FROM txn_revenue
+WHERE p = 0.25 OR p= 0.5 OR p = 0.75 or p = 1
+GROUP BY 2;
+```
+
+| revenue |   p   |
+| ------- | ----- |
+|   377   | 0.25  |
+|   510   | 0.5   |
+|   647	  | 0.75  |
+|   1134  | 1     |
+
