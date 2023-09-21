@@ -213,3 +213,32 @@ FROM
 |t       |1505     |60.2|
 |f       |995      |39.8|
 
+**6. What is the average revenue for member transactions and non-member transactions?**
+
+```sql
+WITH unique_txn AS(
+	SELECT 
+		member,
+		SUM(qty*price) as revenue
+	FROM
+		sales
+	GROUP BY txn_id),
+count_members AS (
+	SELECT
+		member,
+		ROUND(AVG(revenue),1) as avg_txn
+	FROM
+		unique_txn 
+	GROUP BY 1)
+SELECT
+	*
+FROM
+	count_members;
+```
+
+| member | avg_txn |
+| ------ | ------- |
+|t       |516.3    |
+|f       |515.0    |
+
+### 👚 C. Product Analysis
