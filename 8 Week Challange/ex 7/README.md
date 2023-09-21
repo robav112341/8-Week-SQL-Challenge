@@ -164,7 +164,7 @@ GROUP BY 2;
 |   647	  | 0.75  |
 |   1134  | 1     |
 
-**3. What is the average discount value per transaction?**
+**4. What is the average discount value per transaction?**
 
 ```sql
 WITH txn_discount AS(
@@ -183,3 +183,33 @@ FROM
 | avg_discount_per_txn |
 | -------------------- |
 |       62.5           |
+
+
+**5. What is the percentage split of all transactions for members vs non-members?**
+
+```sql
+WITH unique_txn AS(
+	SELECT 
+		*
+	FROM
+		sales
+	GROUP BY txn_id),
+count_members AS (
+	SELECT
+	member,
+		COUNT(*) as count_m,
+		ROUND(COUNT(*)/(SELECT COUNT(*) FROM unique_txn)*100,1) as p
+	FROM
+		unique_txn 
+	GROUP BY 1)
+SELECT
+	*
+FROM
+	count_members;
+```
+
+| member | count_m | p  |
+| ------ | ------- | -- |
+|t       |1505     |60.2|
+|f       |995      |39.8|
+
