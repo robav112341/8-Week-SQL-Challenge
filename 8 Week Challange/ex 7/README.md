@@ -464,7 +464,7 @@ GROUP BY 1;
 |Womens 	|575333 	|44.6       |
 |Mens   	|714120 	|55.4       |
 
-**9. -- What is the total transaction “penetration” for each product?**
+**9. What is the total transaction “penetration” for each product?**
 
 ```sql
 WITH ranked_sales  AS(
