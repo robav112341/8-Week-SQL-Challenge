@@ -103,4 +103,36 @@ GROUP BY 1;
 |Grey Fashion Jacket - Womens    |	   25391.9   |
 |Teal Button Up Shirt - Mens     |     4397.6    |
 
+### 🧾 B. Transaction Analysis
 
+**1. How many unique transactions were there?**
+
+```sql
+SELECT 
+   COUNT(DISTINCT txn_id) as total_txn
+FROM
+    sales;
+```
+
+| total_txn |
+| --------- |
+|   2500    |
+
+**1. What is the average unique products purchased in each transaction?**
+
+```sql
+WITH unique_count AS 
+(	SELECT 
+		txn_id, COUNT(DISTINCT prod_id) AS unique_count
+	FROM
+		sales
+	GROUP BY 1)
+SELECT 
+	ROUND(AVG(unique_count),1) AS avg_product_per_txn
+FROM
+	unique_count;
+```
+
+| avg_product_per_txn |
+| ------------------- |
+|         6.0         |
