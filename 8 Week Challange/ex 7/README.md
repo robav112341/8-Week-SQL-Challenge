@@ -75,4 +75,32 @@ GROUP BY 1;
 |Grey Fashion Jacket - Womens    |	    209304   |
 |Teal Button Up Shirt - Mens     |  	36460    |
 
+**3. What was the total discount amount for all products?**
+
+```sql
+SELECT 
+    pd.product_name,ROUND(SUM(s.qty * s.price * (s.discount / 100)), 1) AS total_discount
+FROM
+    sales s
+     JOIN
+    product_details pd ON s.prod_id = pd.product_id
+GROUP BY 1;
+```
+
+
+|         product_name           |total_discount |
+| ------------------------------ | ------------- |
+|Navy Oversized Jeans - Womens   |	   6135.6    |
+|White Tee Shirt - Mens          |	   18377.6   |
+|White Striped Socks - Mens      |	   7410.8    |
+|Pink Fluro Polkadot Socks - Mens|	   12952.3   |
+|Cream Relaxed Jeans - Womens    |	   4463.4    |
+|Indigo Rain Jacket - Womens     |	   8642.5    |
+|Blue Polo Shirt - Mens          |	   26819.1   |
+|Navy Solid Socks - Mens         |	   16650.4   |
+|Black Straight Jeans - Womens   |	   14745.0   |
+|Khaki Suit Jacket - Womens      |	   10243.1   |
+|Grey Fashion Jacket - Womens    |	   25391.9   |
+|Teal Button Up Shirt - Mens     |     4397.6    |
+
 
