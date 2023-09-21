@@ -171,7 +171,7 @@ WITH rank_product AS(
 	GROUP BY 1
 	ORDER BY 5)
 SELECT
-	*
+	product_name,qty,revenue,total_discount,segment_name
 FROM
 	rank_product
 WHERE ranks = 1;
@@ -227,14 +227,14 @@ SELECT
                         JOIN
                     product_details px ON x.prod_id = px.product_id
                 WHERE
-                    px.segment_id = pd.segment_id),
-            2) AS precentage
+                    px.segment_id = pd.segment_id)*100,
+            1) AS precentage
 FROM
     sales s
         JOIN
     product_details pd ON s.prod_id = pd.product_id
 GROUP BY 2
-ORDER BY 1;
+ORDER BY 1, 3 DESC;
 
 -- Question 7:
 -- What is the percentage split of revenue by segment for each category?
@@ -249,8 +249,8 @@ SELECT
                         JOIN
                     product_details y ON x.prod_id = y.product_id
                 WHERE
-                    y.category_name = pd.category_name),
-            2) AS precentage
+                    y.category_name = pd.category_name)*100,
+            1) AS precentage
 FROM
     sales s
         JOIN
@@ -259,15 +259,15 @@ GROUP BY 2
 ORDER BY 1;
 
 -- Question 8:
--- What is the percentage split of revenue by product for each segment?
+-- What is the percentage split of total revenue by category?
 SELECT 
     pd.category_name,
     SUM(s.qty * s.price) AS revenue,
     ROUND(SUM(s.qty * s.price) / (SELECT 
                     SUM(qty * price)
                 FROM
-                    sales),
-            2) AS precentage
+                    sales)*100,
+            1) AS precentage
 FROM
     sales s
         JOIN
