@@ -23,7 +23,7 @@ Danny needs your help to quantify the impact of this change on the sales perform
 
 ## Case Study Questions
 
-## 🧼 A. Data Cleansing Steps
+### 🧼 A. Data Cleansing Steps
 
 In a single query, perform the following operations and generate a new table in the `data_mart` schema named `clean_weekly_sales`:
 - Convert the `week_date` to a `DATE` format
