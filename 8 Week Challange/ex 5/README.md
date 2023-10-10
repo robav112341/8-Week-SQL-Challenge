@@ -114,3 +114,18 @@ FROM
 ```
 
 ### 🛍 B. Data Exploration
+
+**1. What day of the week is used for each week_date value?**
+
+```sql
+SELECT 
+    IF(DAYOFWEEK(week_date) = 2,
+        'Monday',
+        'ELSE') AS day_of_week
+FROM
+    clean_weekly_sales
+GROUP BY DAYOFWEEK(week_date);
+```
+|day_of_week|
+| --------- |
+|  Monday   |
