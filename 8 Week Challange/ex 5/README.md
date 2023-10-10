@@ -347,3 +347,39 @@ ORDER BY 1 , 2 , 3;
 |2020		|8	|Retail		|2810210216	|96.5|
 |2020		|8	|Shopify	|101583216	|3.5|
 </details>
+
+**7. What is the percentage of sales by demographic for each year in the dataset?**
+
+```sql
+SELECT 
+    s1.calendar_year,
+    s1.demographic,
+    SUM(s1.sales) AS total_sales,
+    ROUND((SUM(s1.sales) / (SELECT 
+                    SUM(s2.sales)
+                FROM
+                    clean_weekly_sales s2
+                WHERE
+                    s1.calendar_year = s2.calendar_year
+                GROUP BY s2.calendar_year)) * 100,
+            1) AS total_sales_P
+FROM
+    clean_weekly_sales s1
+GROUP BY 1 , 2
+ORDER BY 1 , 2;
+```
+
+| calendar_year | demographic |	total_sales | total_sales_P |
+| ------------- | ----------- | ----------- | ------------- |
+|2018		|Couples	|3402388688		|26.4|
+|2018		|Families	|4125558033		|32.0|
+|2018		|Unknown	|5369434106		|41.6|
+|2019		|Couples	|3749251935		|27.3|
+|2019		|Families	|4463918344		|32.5|
+|2019		|Unknown	|5532862221		|40.3|
+|2020		|Couples	|4049566928		|28.7|
+|2020		|Families	|4614338065		|32.7|
+|2020		|Unknown	|5436315907		|38.6|
+
+
+
