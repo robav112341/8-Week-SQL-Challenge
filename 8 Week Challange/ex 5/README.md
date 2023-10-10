@@ -196,7 +196,7 @@ GROUP BY 1;
 | 2019          | 365639285                     |
 | 2020          | 375813651                     |
 
-**4. 4. What is the total sales for each region for each month?**
+**4. What is the total sales for each region for each month?**
 
 ```sql
 SELECT 
@@ -262,3 +262,85 @@ ORDER BY 1 , 2;
 | USA           | 9            | 110532368    |
 
 </details>
+
+**5. What is the total count of transactions for each platform?**
+
+```sql
+SELECT 
+    platform, SUM(transactions) AS total_transcations
+FROM
+    clean_weekly_sales
+GROUP BY 1
+ORDER BY 1;
+```
+
+| platform | total_transactions  |
+|----------|---------------------|
+| Retail   | 1081934227          |
+| Shopify  | 5925169             |
+
+**6.What is the percentage of sales for Retail vs Shopify for each month?**
+
+```sql
+SELECT 
+    s1.calendar_year,
+    s1.month_number,
+    s1.platform,
+    SUM(s1.sales) AS total_sales,
+    ROUND((SUM(sales) / (SELECT 
+                    SUM(s2.sales)
+                FROM
+                    clean_weekly_sales s2
+                WHERE
+                    s2.calendar_year = s1.calendar_year
+                        AND s2.month_number = s1.month_number
+                GROUP BY s2.calendar_year , s2.month_number)) * 100,
+            1) AS precentage
+FROM
+    clean_weekly_sales s1
+GROUP BY 1 , 2 , 3
+ORDER BY 1 , 2 , 3;
+```
+
+|calendar_year|	month_number| platform | total_sales |	precentage |
+| ----------- | ----------- | -------- | ----------- | ----------- |
+|2018		|3	|Retail		|525583061	|97.9|
+|2018		|3	|Shopify	|11172391	|2.1|
+|2018		|4	|Retail		|2617369077	|97.9|
+|2018		|4	|Shopify	|55435570	|2.1|
+|2018		|5	|Retail		|2080290488	|97.7|
+|2018		|5	|Shopify	|48365936	|2.3|
+|2018		|6	|Retail		|2061128568	|97.8|
+|2018		|6	|Shopify	|47323635	|2.2|
+|2018		|7	|Retail		|2646368290	|97.8|
+|2018		|7	|Shopify	|60830182	|2.2|
+|2018		|8	|Retail		|2140297292	|97.7|
+|2018		|8	|Shopify	|50244975	|2.3|
+|2018		|9	|Retail		|540134542	|97.7|
+|2018		|9	|Shopify	|12836820	|2.3|
+|2019		|3	|Retail		|567984858	|97.7|
+|2019		|3	|Shopify	|13332196	|2.3|
+|2019		|4	|Retail		|2836349313	|97.8|
+|2019		|4	|Shopify	|63798008	|2.2|
+|2019		|5	|Retail		|2221160706	|97.5|
+|2019		|5	|Shopify	|56371106	|2.5|
+|2019		|6	|Retail		|2181126868	|97.4|
+|2019		|6	|Shopify	|57727053	|2.6|
+|2019		|7	|Retail		|2785870177	|97.4|
+|2019		|7	|Shopify	|75766614	|2.6|
+|2019		|8	|Retail		|2240942490	|97.2|
+|2019		|8	|Shopify	|64297818	|2.8|
+|2019		|9	|Retail		|564372315	|97.1|
+|2019		|9	|Shopify	|16932978	|2.9|
+|2020		|3	|Retail		|1205620498	|97.3|
+|2020		|3	|Shopify	|33475731	|2.7|
+|2020		|4	|Retail		|2281873844	|97.0|
+|2020		|4	|Shopify	|71478722	|3.0|
+|2020		|5	|Retail		|2284387029	|96.7|
+|2020		|5	|Shopify	|77687860	|3.3|
+|2020		|6	|Retail		|2807693824	|96.8|
+|2020		|6	|Shopify	|92714414	|3.2|
+|2020		|7	|Retail		|2255852981	|96.7|
+|2020		|7	|Shopify	|77642565	|3.3|
+|2020		|8	|Retail		|2810210216	|96.5|
+|2020		|8	|Shopify	|101583216	|3.5|
