@@ -381,5 +381,31 @@ ORDER BY 1 , 2;
 |2020		|Families	|4614338065		|32.7|
 |2020		|Unknown	|5436315907		|38.6|
 
+**8. Which age_band and demographic values contribute the most to Retail sales?**
 
+```sql
+WITH full_data AS (
+	SELECT 
+    *,
+    (CASE
+        WHEN SUBSTRING(segment, 2, 2) = 1 THEN 'Young Adults'
+        WHEN SUBSTRING(segment, 2, 2) = 2 THEN 'Middle Aged'
+        WHEN SUBSTRING(segment, 2, 2) IN (3 , 4) THEN 'Retirees'
+        ELSE 'Unknown'
+    END) AS age_band
+FROM
+    clean_weekly_sales)
+SELECT
+	age_band,
+	sum(sales) as total_sales
+FROM
+	full_data
+WHERE platform = 'Retail' AND age_band <> 'Unknown'
+GROUP BY age_band
+ORDER BY sum(sales) DESC
+LIMIT 1;
+```
 
+| age_band | total_sales | 
+|----------|-------------|
+| Retirees | 13005266930 | 
