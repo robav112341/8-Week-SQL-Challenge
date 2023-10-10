@@ -279,7 +279,7 @@ ORDER BY 1;
 | Retail   | 1081934227          |
 | Shopify  | 5925169             |
 
-**6.What is the percentage of sales for Retail vs Shopify for each month?**
+**6. What is the percentage of sales for Retail vs Shopify for each month?**
 
 ```sql
 SELECT 
