@@ -112,3 +112,5 @@ ORDER BY 4;
 FROM
     clean_weekly_sales;
 ```
+
+### 🛍 B. Data Exploration
