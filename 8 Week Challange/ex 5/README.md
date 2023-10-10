@@ -303,6 +303,7 @@ ORDER BY 1 , 2 , 3;
 ```
 
 <details><summary> Click to expand :arrow_down: </summary>
+	
 |calendar_year|	month_number| platform | total_sales |	precentage |
 | ----------- | ----------- | -------- | ----------- | ----------- |
 |2018		|3	|Retail		|525583061	|97.9|
