@@ -302,6 +302,7 @@ GROUP BY 1 , 2 , 3
 ORDER BY 1 , 2 , 3;
 ```
 
+<details><summary> Click to expand :arrow_down: </summary>
 |calendar_year|	month_number| platform | total_sales |	precentage |
 | ----------- | ----------- | -------- | ----------- | ----------- |
 |2018		|3	|Retail		|525583061	|97.9|
@@ -344,3 +345,4 @@ ORDER BY 1 , 2 , 3;
 |2020		|7	|Shopify	|77642565	|3.3|
 |2020		|8	|Retail		|2810210216	|96.5|
 |2020		|8	|Shopify	|101583216	|3.5|
+</details>
