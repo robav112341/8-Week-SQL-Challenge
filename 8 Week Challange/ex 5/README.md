@@ -32,8 +32,12 @@ In a single query, perform the following operations and generate a new table in 
 - Add a `calendar_year` column as the 4th column containing either 2018, 2019 or 2020 values
 - Add a new column called `age_band` after the original segment column using the following mapping on the number inside the segment value
   
-<img width="166" alt="image" src="https://user-images.githubusercontent.com/81607668/131438667-3b7f3da5-cabc-436d-a352-2022841fc6a2.png">
-  
+| segment | age_band    | 
+| ------- | ----------- |
+| 1       | Young Adults|
+| 2       | Middle Aged |
+| 3 OR 4  | Retirees    |
+
 - Add a new `demographic` column using the following mapping for the first letter in the `segment` values:  
 
 | segment | demographic | 
@@ -43,3 +47,68 @@ In a single query, perform the following operations and generate a new table in 
 
 - Ensure all `null` string values with an "unknown" string value in the original `segment` column as well as the new `age_band` and `demographic` columns
 - Generate a new `avg_transaction` column as the sales value divided by transactions rounded to 2 decimal places for each record
+
+**Query:**
+
+```sql
+DROP TABLE IF EXISTS clean_weekly_sales;
+CREATE TABLE IF NOT EXISTS `clean_weekly_sales` (
+    `week_date` DATE DEFAULT NULL,
+    `week_number` INT DEFAULT NULL,
+    `month_number` INT DEFAULT NULL,
+    `calendar_year` INT DEFAULT NULL,
+    `region` VARCHAR(15) DEFAULT NULL,
+    `platform` VARCHAR(9) DEFAULT NULL,
+    `segment` VARCHAR(4) DEFAULT NULL,
+    `customer_type` VARCHAR(11) DEFAULT NULL,
+    `demographic` VARCHAR(20) DEFAULT NULL,
+    `transactions` INT DEFAULT NULL,
+    `sales` INT DEFAULT NULL,
+    `avg_transaction` DOUBLE DEFAULT NULL
+);
+
+INSERT INTO clean_weekly_sales (
+week_date,
+week_number,
+month_number,
+calendar_year,
+region,
+platform,
+segment,
+customer_type,
+demographic,
+transactions,
+sales,
+avg_transaction)
+SELECT 
+    STR_TO_DATE(week_date, '%d/%m/%y') AS week_date,
+    EXTRACT(WEEK FROM STR_TO_DATE(week_date, '%d/%m/%y')) AS week_number,
+    EXTRACT(MONTH FROM STR_TO_DATE(week_date, '%d/%m/%y')) AS month_number,
+    EXTRACT(YEAR FROM STR_TO_DATE(week_date, '%d/%m/%y')) AS calendar_year,
+    region,
+    platform,
+    segment,
+    customer_type,
+    (CASE
+        WHEN SUBSTRING(segment, 1, 1) = 'C' THEN 'Couples'
+        WHEN SUBSTRING(segment, 1, 1) = 'F' THEN 'Families'
+        ELSE 'Unknown'
+    END) AS demographic,
+    transactions,
+    sales,
+    ROUND((sales / transactions), 1) AS avg_transaction 
+FROM
+    Weekly_sales
+ORDER BY 4;
+
+-- some kind of error in age_band, saved query for later use:
+ SELECT 
+    (CASE
+        WHEN SUBSTRING(segment, 2, 2) = 1 THEN 'Young Adults'
+        WHEN SUBSTRING(segment, 2, 2) = 2 THEN 'Middle Aged'
+        WHEN SUBSTRING(segment, 2, 2) IN (3 , 4) THEN 'Retirees'
+        ELSE 'Unknown'
+    END) AS age_band
+FROM
+    clean_weekly_sales;
+```
