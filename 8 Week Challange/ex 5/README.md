@@ -548,3 +548,49 @@ ON s1.calendar_year = s2.calendar_year;
 | 2019          | 2249989796 | 2252326390 | 2336594         | 0.1       |
 | 2020          | 2345878357 | 2318994169 | -26884188       | -1.1      |
 
+**4. Which areas of the business have the highest negative impact in sales metrics performance in 2020 for the 12 week before and after period?**
+
+Guest
+
+```sql
+WITH w_number AS (
+	SELECT 
+		week_number
+	FROM
+	clean_weekly_sales
+	WHERE
+		week_date = '2020-06-15'
+    GROUP BY week_number),
+total_sales_before AS (
+	SELECT
+		customer_type,
+		sum(sales) as sum_before
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number) -12  AND (SELECT week_number FROM w_number) -1 AND calendar_year = 2020
+    GROUP BY 1),
+total_sales_after AS (
+	SELECT
+		customer_type,
+		sum(sales) as sum_after
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number)   AND (SELECT week_number FROM w_number) +11 AND calendar_year = 2020
+    GROUP BY 1)
+SELECT
+	s1.customer_type,
+	s1.sum_before,
+	s2.sum_after,
+	(s2.sum_after - s1.sum_before) as total_change,
+	ROUND((s2.sum_after/s1.sum_before - 1)*100,2) as p_change
+FROM
+	total_sales_before s1
+JOIN 
+	total_sales_after s2 ON s1.customer_type = s2.customer_type
+ORDER BY 5;
+```
+
+| calendar_year | sum_before | sum_after  | total_change    | p_change  |
+|---------------|------------|------------|-----------------|---------- |
+| Guest         | 2573436301 | 2496233635 | -77202666       | -3.00     |
+| Existing      | 3690116427 | 3606243454 | -83872973       | -2.27     |
+| New           | 862720419  | 871470664  | 8750245         | 1.01      |
+
