@@ -588,7 +588,7 @@ JOIN
 ORDER BY 5;
 ```
 
-| calendar_year | sum_before | sum_after  | total_change    | p_change  |
+| customer_type | sum_before | sum_after  | total_change    | p_change  |
 |---------------|------------|------------|-----------------|---------- |
 | Guest         | 2573436301 | 2496233635 | -77202666       | -3.00     |
 | Existing      | 3690116427 | 3606243454 | -83872973       | -2.27     |
