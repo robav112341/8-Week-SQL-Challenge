@@ -108,7 +108,7 @@ ORDER BY 1 , 2;
 -- Question 5:
 -- What is the total count of transactions for each platform?
 SELECT 
-    platform, COUNT(transactions) AS count_transcations
+    platform, SUM(transactions) AS total_transcations
 FROM
     clean_weekly_sales
 GROUP BY 1
@@ -155,7 +155,7 @@ GROUP BY 1 , 2
 ORDER BY 1 , 2;
 
 -- Question 8
--- What is the percentage of sales by demographic for each year in the dataset?
+-- Which age_band and demographic values contribute the most to Retail sales?
 WITH full_data AS (
 	SELECT 
     *,
@@ -169,7 +169,7 @@ FROM
     clean_weekly_sales)
 SELECT
 	age_band,
-	sum(sales)
+	sum(sales) as total_sales
 FROM
 	full_data
 WHERE platform = 'Retail' AND age_band <> 'Unknown'
@@ -182,10 +182,11 @@ LIMIT 1;
 SELECT 
     calendar_year,
     platform,
-    ROUND(AVG(avg_transaction), 1) AS avg_transaction
+    ROUND(SUM(sales) / SUM(transactions), 1) AS avg_transaction
 FROM
     clean_weekly_sales
-GROUP BY 1 , 2;
+GROUP BY 1 , 2
+ORDER BY 1 , 2;
 
 -- 3. Before & After Analysis
 -- Question 1
