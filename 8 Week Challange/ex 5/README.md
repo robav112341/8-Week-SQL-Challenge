@@ -433,3 +433,118 @@ ORDER BY 1 , 2;
 | 2020          | Retail   | 36.6            | 
 | 2020          | Shopify  | 179.0           | 
 
+### 🧼 C. Before & After Analysis
+
+**1. What is the total sales for the 4 weeks before and after 2020-06-15? What is the growth or reduction rate in actual values and percentage of sales?**
+
+```sql
+WITH w_number AS (
+	SELECT 
+		week_number
+	FROM
+		clean_weekly_sales
+	WHERE
+		week_date = '2020-06-15'
+    GROUP BY week_number),
+total_sales_before AS (
+	SELECT sum(sales) as sum_before
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number) -4  AND (SELECT week_number FROM w_number) -1 AND calendar_year = 2020),
+total_sales_after AS (
+	SELECT sum(sales) as sum_after
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number)   AND (SELECT week_number FROM w_number) +3 AND calendar_year = 2020),
+sum_table AS (
+	SELECT (SELECT sum_before FROM total_sales_before) AS sales_before,
+		(SELECT sum_after FROM total_sales_after) AS sales_after)
+SELECT 
+	sales_before,
+    sales_after,
+    -(sales_before-sales_after) AS change_in_sales,
+    (sales_before/sales_after-1)*100 AS change_in_p
+    FROM
+    sum_table;
+```
+
+| sales_before       | sales_after       | change_in_sales | change_in_p           |
+|--------------------|-------------------|-----------------|-----------------------|
+| 2345878357         | 2318994169        | -26884188       | -1.1593               |
+
+**2. What about the entire 12 weeks before and after?**
+
+```sql
+WITH w_number AS (
+	SELECT 
+		week_number
+	FROM
+		clean_weekly_sales
+	WHERE
+		week_date = '2020-06-15'
+    GROUP BY week_number),
+total_sales_before AS (
+	SELECT sum(sales) as sum_before
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number) -12  AND (SELECT week_number FROM w_number) -1 AND calendar_year = 2020),
+total_sales_after AS (
+	SELECT sum(sales) as sum_after
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number)   AND (SELECT week_number FROM w_number) +11 AND calendar_year = 2020),
+sum_table AS (
+SELECT (SELECT sum_before FROM total_sales_before) AS sales_before,
+		(SELECT sum_after FROM total_sales_after) AS sales_after)
+SELECT 
+	sales_before,
+	sales_after,
+    -(sales_before-sales_after) AS change_in_sales,
+    (sales_before/sales_after-1)*100 AS change_in_p 
+    FROM 
+    sum_table;
+```
+| sales_before       | sales_after       | change_in_sales | change_in_p           |
+|--------------------|-------------------|-----------------|-----------------------|
+| 7126273147         | 6973947753        | -152325394      | -2.1842               |
+
+**3. What about the entire 12 weeks before and after?**
+
+```sql
+WITH w_number AS (
+	SELECT 
+		week_number
+	FROM
+		clean_weekly_sales
+	WHERE
+		week_date = '2020-06-15'
+    GROUP BY week_number),
+total_sales_before AS (
+	SELECT 
+		calendar_year,
+		sum(sales) as sum_before
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number) -4  AND (SELECT week_number FROM w_number) -1
+    GROUP BY 1),
+total_sales_after AS (
+	SELECT
+		calendar_year,
+		sum(sales) as sum_after
+	FROM clean_weekly_sales 
+	WHERE week_number BETWEEN (SELECT week_number FROM w_number)   AND (SELECT week_number FROM w_number) +3
+    GROUP BY 1)
+SELECT 
+	s1.calendar_year,
+	s1.sum_before,
+	s2.sum_after,
+	(s2.sum_after-s1.sum_before) as total_change,
+	ROUND((s2.sum_after/s1.sum_before -1)*100,1) AS p_change
+FROM
+	total_sales_before s1 
+JOIN
+	total_sales_after s2
+ON s1.calendar_year = s2.calendar_year;
+```
+
+| calendar_year | sum_before | sum_after  | total_change    | p_change  |
+|---------------|------------|------------|-----------------|---------- |
+| 2018          | 2125140809 | 2129242914 | 4102105         | 0.2       |
+| 2019          | 2249989796 | 2252326390 | 2336594         | 0.1       |
+| 2020          | 2345878357 | 2318994169 | -26884188       | -1.1      |
+
