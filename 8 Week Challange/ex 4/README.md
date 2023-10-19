@@ -140,3 +140,50 @@ WHERE
 | avg_node_time |
 |-------------- |
 |     14.63     |
+
+**5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?**
+
+```sql
+WITH percentile_cte AS (
+	SELECT 
+		*, 	
+		DATEDIFF(end_date, start_date) AS avg_time,
+		ROUND(PERCENT_RANK() OVER (PARTITION BY region_id ORDER BY DATEDIFF(end_date, start_date)),1) AS percentile
+
+	FROM
+		customer_nodes
+	WHERE
+		end_date != '9999-12-31')
+SELECT 
+	r.region_name,
+	ROUND(AVG(pc.avg_time),2) AS avg_node_time,
+	pc.percentile
+FROM
+	percentile_cte pc
+JOIN
+	regions r ON pc.region_id = r.region_id
+WHERE pc.percentile = 0.5 OR pc.percentile = 0.8 OR pc.percentile = 0.9
+GROUP BY 1, 3
+ORDER BY 1, 3;
+```
+<details><summary> Click to expand :arrow_down: </summary>
+    
+| region_name | avg_node_time| percentile |
+|-------------|--------------|------------|
+| Africa      | 14.83        | 0.5        |
+| Africa      | 23.99        | 0.8        |
+| Africa      | 26.79        | 0.9        |
+| America     | 15.05        | 0.5        |
+| America     | 23.55        | 0.8        |
+| America     | 26.97        | 0.9        |
+| Asia        | 15.15        | 0.5        |
+| Asia        | 23.02        | 0.8        |
+| Asia        | 26.42        | 0.9        |
+| Australia   | 14.89        | 0.5        |
+| Australia   | 24.00        | 0.8        |
+| Australia   | 27.06        | 0.9        |
+| Europe      | 15.48        | 0.5        |
+| Europe      | 25.02        | 0.8        |
+| Europe      | 27.50        | 0.9        |
+
+</details>
