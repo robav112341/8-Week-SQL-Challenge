@@ -5,7 +5,7 @@
 ## 📚 Table of Contents
 - [Business Task](#business-task)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
-- [Question and Solution](#Customer Nodes Exploration)
+- [Question and Solution](#A.-Customer-Nodes-Exploration)
 
 Please note that all the information regarding the case study has been sourced from the following link: [here](https://8weeksqlchallenge.com/case-study-4/). 
 
