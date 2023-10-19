@@ -125,3 +125,18 @@ ORDER BY 1;
 | Asia        | 95             |
 | Australia   | 110            |
 | Europe      | 88             |
+
+**4. How many days on average are customers reallocated to a different node?**
+
+```sql
+SELECT 
+    ROUND(AVG(DATEDIFF(end_date, start_date)), 2) AS avg_node_time
+FROM
+    customer_nodes
+WHERE
+    end_date != '9999-12-31';
+```
+
+| avg_node_time |
+|-------------- |
+|     14.63     |
