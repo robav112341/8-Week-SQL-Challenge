@@ -1,4 +1,4 @@
-## Case Study #4: Data Bank
+# Case Study #4: Data Bank
 
 <img src="https://user-images.githubusercontent.com/81607668/130343294-a8dcceb7-b6c3-4006-8ad2-fab2f6905258.png" alt="Image" width="500" height="520">
 
@@ -44,12 +44,19 @@ This table stores all customer deposits, withdrawals and purchases made using th
 
 ***
 
-## Question and Solution
 
-Please join me in executing the queries using PostgreSQL on [DB Fiddle](https://www.db-fiddle.com/f/2GtQz4wZtuNNu7zXH5HtV4/3). It would be great to work together on the questions!
-
-If you have any questions, reach out to me on [LinkedIn](https://www.linkedin.com/in/katiehuangx/).
-
-## 🏦 A. Customer Nodes Exploration
+### 🏦 A. Customer Nodes Exploration
 
 **1. How many unique nodes are there on the Data Bank system?**
+
+```sql
+SELECT 
+    COUNT(DISTINCT node_id) count_nodes
+FROM
+    customer_nodes;
+```
+
+| count_nodes |
+|-------------|
+|      5      |
+
