@@ -83,6 +83,7 @@ ORDER BY 1;
 | Europe      | 5          |
 
 **3. How many customers are allocated to each region?**
+
 non-unique customers:
 
 ```sql
