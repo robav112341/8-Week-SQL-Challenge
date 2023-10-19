@@ -61,3 +61,23 @@ FROM
 |-------------|
 |      5      |
 
+**2.  What is the number of nodes per region?**
+
+```sql
+SELECT 
+    r.region_name, COUNT(DISTINCT node_id) AS node_count
+FROM
+    customer_nodes cn
+        JOIN
+    regions r ON cn.region_id = r.region_id
+GROUP BY 1
+ORDER BY 1;
+```
+
+| region_name | node_count |
+|-------------|------------|
+| Africa      | 5          |
+| America     | 5          |
+| Asia        | 5          |
+| Australia   | 5          |
+| Europe      | 5          |
