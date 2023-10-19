@@ -81,3 +81,46 @@ ORDER BY 1;
 | Asia        | 5          |
 | Australia   | 5          |
 | Europe      | 5          |
+
+**3. How many customers are allocated to each region?**
+non-unique customers:
+
+```sql
+SELECT 
+    r.region_name, COUNT(customer_id) AS customer_count
+FROM
+    customer_nodes cn
+        JOIN
+    regions r ON cn.region_id = r.region_id
+GROUP BY 1
+ORDER BY 1;
+```
+
+| region_name | customer_count |
+|-------------|----------------|
+| Africa      | 714            |
+| America     | 735            |
+| Asia        | 665            |
+| Australia   | 770            |
+| Europe      | 616            |
+
+unique customers:
+
+```sql
+SELECT 
+    r.region_name, COUNT(DISTINCT customer_id) AS customer_count
+FROM
+    customer_nodes cn
+        JOIN
+    regions r ON cn.region_id = r.region_id
+GROUP BY 1
+ORDER BY 1;
+```
+
+| region_name | customer_count |
+|-------------|----------------|
+| Africa      | 102            |
+| America     | 105            |
+| Asia        | 95             |
+| Australia   | 110            |
+| Europe      | 88             |
