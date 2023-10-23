@@ -37,3 +37,115 @@ FROM
 | number_of_pizzas        |
 | ----------------------- |
 | 14                      |
+
+**2. How many unique customer orders were made?**
+
+```sql
+SELECT 
+    customer_id, COUNT(DISTINCT order_id) AS unique_orders
+FROM
+    customer_orders
+GROUP BY 1;
+```
+
+| customer_id | unique_orders          |
+| ----------- | ---------------------- |
+| 101         | 3                      |
+| 102         | 2                      |
+| 103         | 2                      |
+| 104         | 2                      |
+| 105         | 1                      |
+
+**3. How many successful orders were delivered by each runner?**
+
+```sql
+SELECT 
+    runner_id, COUNT(*) AS num_of_orders
+FROM
+    runner_orders
+WHERE
+    cancellation NOT IN ('Restaurant Cancellation' , 'Customer Cancellation')
+        OR cancellation IS NULL
+GROUP BY 1;
+```
+| runner_id | num_of_orders    |
+| --------- | ---------------- |
+| 1         | 4                |
+| 2         | 3                |
+| 3         | 1                |
+
+**4. How many of each type of pizza was delivered?**
+
+```sql
+SELECT 
+    co.pizza_id, pn.pizza_name, COUNT(*) AS num_of_orders
+FROM
+    customer_orders co
+        JOIN
+    pizza_names pn ON co.pizza_id = pn.pizza_id
+        JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    ro.cancellation NOT IN ('Restaurant Cancellation' , 'Customer Cancellation')
+        OR ro.cancellation IS NULL
+GROUP BY 1
+ORDER BY 1;
+```
+
+| pizza_id | pizza_name  | num_of_orders |
+|----------|-------------|---------------|
+| 1        | Meatlovers  | 9             |
+| 2        | Vegetarian  | 3             |
+
+**5. How many Vegetarian and Meatlovers were ordered by each customer?**
+
+```sql
+SELECT 
+    co.customer_id, pn.pizza_name, COUNT(*) AS number_of_orders
+FROM
+    customer_orders co
+        JOIN
+    pizza_names pn ON co.pizza_id = pn.pizza_id
+GROUP BY 1 , 2
+ORDER BY 1 , 2;
+```
+| customer_id | pizza_name | number_of_orders           |
+| ----------- | ---------- | -------------------------- |
+| 101         | Meatlovers | 2                          |
+| 101         | Vegetarian | 1                          |
+| 102         | Meatlovers | 2                          |
+| 102         | Vegetarian | 1                          |
+| 103         | Meatlovers | 3                          |
+| 103         | Vegetarian | 1                          |
+| 104         | Meatlovers | 3                          |
+| 105         | Vegetarian | 1                          |
+
+**6. What was the maximum number of pizzas delivered in a single order?**
+
+```sql
+WITH cte AS(
+	SELECT
+    order_id,
+    COUNT(*) AS count_products
+    FROM
+    customer_orders
+    GROUP BY 1)
+    SELECT
+    c.order_id,
+    c.count_products
+    FROM
+    cte c 
+    JOIN runner_orders ro ON c.order_id = ro.order_id AND c.order_id = (SELECT order_id FROM cte WHERE count_products = (SELECT MAX(count_products) FROM cte))
+    WHERE
+    ro.cancellation NOT IN ('Restaurant Cancellation' , 'Customer Cancellation')
+        OR cancellation IS NULL;
+```
+
+| order_id | count_products |
+|----------|----------------|
+| 4        | 3              |
+
+**7.**
+
+
+
