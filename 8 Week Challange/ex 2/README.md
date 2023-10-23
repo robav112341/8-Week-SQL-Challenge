@@ -6,7 +6,6 @@
 - [Business Task](#business-task)
 - [Entity Relationship Diagram](#entity-relationship-diagram)
 - Solution
-  - [Data Cleaning and Transformation](#-data-cleaning--transformation)
   - [A. Pizza Metrics](#a-pizza-metrics)
   - [B. Runner and Customer Experience](#b-runner-and-customer-experience)
   - [C. Ingredient Optimisation](#c-ingredient-optimisation)
@@ -23,4 +22,6 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 
 ![Pizza Runner](https://github.com/katiehuangx/8-Week-SQL-Challenge/assets/81607668/78099a4e-4d0e-421f-a560-b72e4321f530)
 
-## 🧼 Data Cleaning & Transformation
+## Case Study Questions
+
+### A. Pizza Metrics:
