@@ -315,7 +315,7 @@ the answer is 1720 rows long, therefore i posting only the first 20:
 
 **5. What is the percentage of customers who increase their closing balance by more than 5%?**
 
-``sql
+```sql
 WITH month_sum AS(
 	SELECT 
 		customer_id,
