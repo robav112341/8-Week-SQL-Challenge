@@ -25,3 +25,15 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 ## Case Study Questions
 
 ### A. Pizza Metrics:
+
+**1. How many pizzas were ordered?**
+
+```sql
+SELECT 
+    COUNT(*) AS number_of_pizzas
+FROM
+    customer_orders;
+```
+| number_of_pizzas        |
+| ----------------------- |
+| 14                      |
