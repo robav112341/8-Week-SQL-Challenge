@@ -261,3 +261,116 @@ ORDER BY 1;
 | 2      | 181            |
 | 3      | 192            |
 | 4      | 70             |
+
+**4. What is the closing balance for each customer at the end of the month? Also show the change in balance each month in the same table output.**
+
+```sql
+WITH month_sum AS(
+	SELECT 
+		customer_id,
+		MONTH(txn_date) AS _month,
+		SUM(CASE
+			WHEN txn_type = 'deposit' THEN txn_amount
+			ELSE - txn_amount
+			END) AS monthly_change
+	FROM
+		customer_transactions
+	GROUP BY 1 , 2
+	ORDER BY 1 , 2)
+SELECT 
+*,
+sum(monthly_change) OVER(PARTITION BY customer_id
+                                     ORDER BY _month ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) AS balance
+FROM month_sum;
+```
+the answer is 1720 rows long, therefore i posting only the first 20:
+
+<details><summary> Click to expand :arrow_down: </summary>
+    
+| customer_id | _month | monthly_change | balance |
+|-------------|--------|----------------|---------|
+| 1           | 1      | 312            | 312     |
+| 1           | 3      | -952           | -640    |
+| 2           | 1      | 549            | 549     |
+| 2           | 3      | 61             | 610     |
+| 3           | 1      | 144            | 144     |
+| 3           | 2      | -965           | -821    |
+| 3           | 3      | -401           | -1222   |
+| 3           | 4      | 493            | -729    |
+| 4           | 1      | 848            | 848     |
+| 4           | 3      | -193           | 655     |
+| 5           | 1      | 954            | 954     |
+| 5           | 3      | -2877          | -1923   |
+| 5           | 4      | -490           | -2413   |
+| 6           | 1      | 733            | 733     |
+| 6           | 2      | -785           | -52     |
+| 6           | 3      | 392            | 340     |
+| 7           | 1      | 964            | 964     |
+| 7           | 2      | 2209           | 3173    |
+| 7           | 3      | -640           | 2533    |
+| 7           | 4      | 90             | 2623    |
+| 8           | 1      | 587            | 587     |
+
+</details>
+
+**5. What is the percentage of customers who increase their closing balance by more than 5%?**
+
+``sql
+WITH month_sum AS(
+	SELECT 
+		customer_id,
+		MONTH(txn_date) AS _month,
+		SUM(CASE
+			WHEN txn_type = 'deposit' THEN txn_amount
+			ELSE - txn_amount
+			END) AS monthly_change
+	FROM
+		customer_transactions
+	GROUP BY 1 , 2
+	ORDER BY 1 , 2),
+balance AS (
+	SELECT 
+		*,
+		sum(monthly_change) OVER(PARTITION BY customer_id
+                                     ORDER BY _month ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) AS balance
+	FROM month_sum),
+first_row AS (	
+    SELECT
+		*,
+		ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY _month) AS first_row
+    FROM
+		balance),
+last_row AS (	
+    SELECT
+		*,
+		ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY _month DESC) AS last_row
+    FROM
+		balance),
+first_txn AS(
+	SELECT 
+		*
+	FROM
+		first_row
+	WHERE 
+		first_row = 1),
+last_txn AS(
+	SELECT 
+		*
+	FROM
+		last_row
+	WHERE 
+		last_row = 1)
+SELECT 
+	COUNT(*) AS blanace_grow_by_5P_or_more,
+    ROUND(COUNT(*)/(SELECT COUNT(DISTINCT customer_id) FROM customer_transactions) * 100,2) AS out_of_total
+FROM
+	first_txn ft
+JOIN
+	last_txn lt ON ft.customer_id = lt.customer_id
+WHERE (lt.balance > 0 AND  ft.balance > 0 AND lt.balance AND lt.balance/ft.balance -1 > 0.05)
+	OR (lt.balance > 0 AND  ft.balance < 0)
+ ```
+
+| balance_grow_by_5P_or_more  | out_of_total |
+|-----------------------------|--------------|
+| 151                         | 30.20        |
