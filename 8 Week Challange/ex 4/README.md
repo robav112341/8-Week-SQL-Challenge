@@ -187,3 +187,77 @@ ORDER BY 1, 3;
 | Europe      | 27.50        | 0.9        |
 
 </details>
+
+**1. What is the unique count and total amount for each transaction type?**
+
+```sql
+SELECT 
+    txn_type,
+    COUNT(*) AS count_customers,
+    SUM(txn_amount) AS total_amount
+FROM
+    customer_transactions
+GROUP BY 1
+ORDER BY 1;
+```
+
+| txn_type   | count_customers | total_amount |
+|------------|----------------|---------------|
+| deposit    | 2671           | 1359168       |
+| purchase   | 1617           | 806537        |
+| withdrawal | 1580           | 793003        |
+
+**2. What is the unique count and total amount for each transaction type?**
+
+```sql
+WITH count_cte AS(
+	SELECT 
+		customer_id,
+        COUNT(*) AS time_count,
+        AVG(txn_amount) AS avg_amount
+	FROM
+		customer_transactions
+	WHERE
+		txn_type = 'deposit'
+	GROUP BY 1)
+SELECT
+	ROUND(AVG(time_count),1) as avg_count,
+	ROUND(AVG(avg_amount),1) as avg_amount
+FROM
+	count_cte;
+```
+
+| avg_count | avg_amount |
+|-----------|------------|
+| 5.3       | 508.6      |
+
+**3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?**
+
+```sql
+WITH type_count AS(
+	SELECT
+		customer_id,
+        MONTH(txn_date) AS month_,
+        SUM(CASE WHEN txn_type = 'deposit' THEN 1 ELSE 0 END) AS deposit_c,
+		SUM(CASE WHEN txn_type = 'purchase' THEN 1 ELSE 0 END) AS purchase_c,
+        SUM(CASE WHEN txn_type = 'withdrawal' THEN 1 ELSE 0 END) AS withdrawal_C
+	FROM
+        customer_transactions 
+	GROUP BY 1,2
+    ORDER BY 1)
+SELECT
+  month_,
+  COUNT(customer_id) AS customer_count
+FROM type_count
+WHERE deposit_c > 1 
+  AND (purchase_c >= 1 OR withdrawal_c >= 1)
+GROUP BY 1
+ORDER BY 1;
+```
+
+| month_ | customer_count |
+|--------|----------------|
+| 1      | 168            |
+| 2      | 181            |
+| 3      | 192            |
+| 4      | 70             |
