@@ -287,3 +287,21 @@ ORDER BY 2 DESC;
 | Friday     | 1           |
 
 ### B. Runner and Customer Experience
+
+**1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
+
+```sql
+SELECT 
+	CONCAT('Week', ' ', FLOOR((DAY(registration_date) - 1) / 7) + 1) AS Week,
+    COUNT(*) AS count_runners
+FROM
+    runners
+GROUP BY FLOOR((DAY(registration_date) - 1) / 7) + 1;
+```
+
+| Week   | count_runners |
+|--------|---------------|
+| Week 1 | 2             |
+| Week 2 | 1             |
+| Week 3 | 1             |
+
