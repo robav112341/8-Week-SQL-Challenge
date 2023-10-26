@@ -145,7 +145,72 @@ WITH cte AS(
 |----------|----------------|
 | 4        | 3              |
 
-**7.**
+**7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?**
 
+```sql
+ WITH changed_cte AS (
+	SELECT 
+		co.customer_id,
+		SUM(CASE
+			WHEN
+				(co.extras IS NOT NULL
+					AND co.extras <> 'null'
+					AND co.extras <> '')
+					OR (co.exclusions IS NOT NULL
+					AND co.exclusions <> 'null'
+					AND exclusions <> '')
+			THEN
+				1
+			ELSE 0
+		END) AS changed
+	FROM
+		customer_orders co
+	JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+	WHERE
+		distance <> 'null'
+	GROUP BY 1
+	ORDER BY 1),
+unchanged_cte AS (
+	SELECT 
+		co.customer_id,
+		SUM(CASE
+			WHEN extras = '' AND exclusions = '' THEN 1
+			WHEN extras = '' AND exclusions = 'null' THEN 1
+			WHEN extras = 'null' AND exclusions = 'null' THEN 1
+			WHEN extras = 'null' AND exclusions = '' THEN 1
+			WHEN extras IS NULL AND exclusions = '' THEN 1
+			WHEN extras = '' AND exclusions IS NULL THEN 1
+			ELSE 0
+		END) AS unchanged
+	FROM
+		customer_orders co
+	JOIN
+		runner_orders ro ON co.order_id = ro.order_id
+	WHERE distance <> 'null'
+	GROUP BY 1
+	ORDER BY 1),
+combined_cte AS (
+	SELECT
+		cc.customer_id,
+		cc.changed,
+		uc.unchanged
+	FROM
+		changed_cte cc
+	JOIN
+		unchanged_cte uc ON cc.customer_id = uc.customer_id)
+SELECT
+	cc.*
+FROM
+	combined_cte cc;
+```
+
+| customer_id | changed | unchanged |
+|-------------|---------|-----------|
+| 101         | 0       | 2         |
+| 102         | 0       | 3         |
+| 103         | 3       | 0         |
+| 104         | 2       | 1         |
+| 105         | 1       | 0         |
 
 
