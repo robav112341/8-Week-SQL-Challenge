@@ -411,3 +411,27 @@ WITH max_min AS (
 |-------------|
 | 30          |
 
+**6. What was the average speed for each runner for each delivery and do you notice any trend for these values?**
+
+```sql
+SELECT 
+    order_id,
+    runner_id,
+    ROUND((distance / (duration / 60)), 0) AS avg_speed
+FROM
+    runner_orders
+WHERE
+    distance != 'null';
+```
+| order_id | runner_id | avg_speed |
+|----------|-----------|-----------|
+| 1        | 1         | 38        |
+| 2        | 1         | 44        |
+| 3        | 1         | 40        |
+| 4        | 2         | 35        |
+| 5        | 3         | 40        |
+| 7        | 2         | 60        |
+| 8        | 2         | 94        |
+| 10       | 1         | 60        |
+
+it is noticeable that the average speed of runners increases every order.
