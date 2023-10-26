@@ -396,3 +396,18 @@ GROUP BY 1;
 | 103         | 23.4                |
 | 104         | 10                  |
 | 105         | 25                  |
+
+**5. What was the difference between the longest and shortest delivery times for all orders?**
+
+```sql
+WITH max_min AS (
+	SELECT
+	(SELECT MAX(duration) FROM runner_orders WHERE duration != 'null') AS max_duration,
+    (SELECT MIN(duration) FROM runner_orders) AS min_duration)
+    SELECT (max_duration - min_duration) AS max_sub_min FROM max_min;
+```
+
+| max_sub_min |
+|-------------|
+| 30          |
+
