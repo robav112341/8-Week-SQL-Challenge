@@ -305,3 +305,29 @@ GROUP BY FLOOR((DAY(registration_date) - 1) / 7) + 1;
 | Week 2 | 1             |
 | Week 3 | 1             |
 
+**2. What was the average time in minutes it took for each runner to arrive at the Pizza Runner HQ to pickup the order?**
+
+```sql
+WITH cte AS (
+	SELECT
+		* 
+	FROM 
+		customer_orders
+    GROUP BY order_id)
+SELECT
+	ro.runner_id,
+   - ROUND(AVG(timestampdiff(MINUTE,ro.pickup_time,c.order_time)),1) AS avg_time
+FROM
+    cte c
+        JOIN
+    runner_orders ro ON c.order_id = ro.order_id
+WHERE
+    distance <> 'null'
+GROUP BY 1;
+```
+
+| runner_id | avg_time |
+|-----------|----------|
+| 1         | 14.0     |
+| 2         | 19.7     |
+| 3         | 10.0     |
