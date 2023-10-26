@@ -213,4 +213,24 @@ FROM
 | 104         | 2       | 1         |
 | 105         | 1       | 0         |
 
+**8. How many pizzas were delivered that had both exclusions and extras?**
+
+```sql
+SELECT 
+    COUNT(*) AS exatras_and_exclusions
+FROM
+    customer_orders co
+JOIN
+	runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    LENGTH(co.exclusions) > 0
+        AND LENGTH(co.extras) > 0
+        AND co.exclusions <> 'null'
+        AND co.extras <> 'null'
+        AND ro.distance <> 'null';
+```
+
+| exatras_and_exclusions |
+| ---------------------- |
+|           1            |
 
