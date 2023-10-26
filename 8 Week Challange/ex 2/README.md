@@ -234,3 +234,56 @@ WHERE
 | ---------------------- |
 |           1            |
 
+**9. What was the total volume of pizzas ordered for each hour of the day?**
+
+```sql
+SELECT 
+    HOUR(co.order_time) AS hours , COUNT(*) as count_volume
+FROM
+    customer_orders co
+JOIN
+	runner_orders ro ON co.order_id = ro.order_id
+WHERE
+	ro.distance <> 'null'
+GROUP BY 1
+ORDER BY 2 DESC, 1;
+```
+
+| hours | count_volume |
+|-------|--------------|
+| 13    | 3            |
+| 18    | 3            |
+| 23    | 3            |
+| 21    | 2            |
+| 19    | 1            |
+
+**10. What was the volume of orders for each day of the week?**
+
+```sql
+SELECT 
+    (SELECT 
+            CASE
+                    WHEN DAYOFWEEK(order_time) = 1 THEN 'Sunday'
+                    WHEN DAYOFWEEK(order_time) = 2 THEN 'Monday'
+                    WHEN DAYOFWEEK(order_time) = 3 THEN 'Tuesday'
+                    WHEN DAYOFWEEK(order_time) = 4 THEN 'Wednesnday'
+                    WHEN DAYOFWEEK(order_time) = 5 THEN 'Thursday'
+                    WHEN DAYOFWEEK(order_time) = 6 THEN 'Friday'
+                    ELSE 'Saturday'
+                END
+        ) AS the_day,
+    COUNT(*) AS order_count
+FROM
+    customer_orders
+GROUP BY DAYOFWEEK(order_time)
+ORDER BY 2 DESC;
+```
+
+| the_day    | order_count |
+|------------|-------------|
+| Wednesday  | 5           |
+| Saturday   | 5           |
+| Thursday   | 3           |
+| Friday     | 1           |
+
+### B. Runner and Customer Experience
