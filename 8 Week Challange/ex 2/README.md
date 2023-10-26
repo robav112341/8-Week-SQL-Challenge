@@ -375,3 +375,24 @@ WHERE
 
 I don't think there is any connection between the number of pizzas in the order, and the avg cooking time, but there sure is a relationship between the avg pick-up time and the pizzas count, the pickup time increases as the count is rising. 
 
+**4. What was the average distance travelled for each customer?**
+
+```sql
+SELECT 
+    co.customer_id, ROUND(AVG(ro.distance), 1) AS avg_distance
+FROM
+    customer_orders co
+        JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    ro.distance != 'null'
+GROUP BY 1;
+```
+
+| customer_id | average_distance    |
+|-------------|---------------------|
+| 101         | 20                  |
+| 102         | 16.7                |
+| 103         | 23.4                |
+| 104         | 10                  |
+| 105         | 25                  |
