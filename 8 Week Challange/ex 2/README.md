@@ -331,3 +331,47 @@ GROUP BY 1;
 | 1         | 14.0     |
 | 2         | 19.7     |
 | 3         | 10.0     |
+
+
+**3. Is there any relationship between the number of pizzas and how long the order takes to prepare?**
+```sql
+WITH cte AS (
+	SELECT 
+		* 
+	FROM 
+		customer_orders
+    GROUP BY order_id),
+pizza_count AS (
+	SELECT
+		order_id,
+		COUNT(*) AS pizza_count
+    FROM 
+		customer_orders
+    GROUP BY 1)
+SELECT
+	c.order_id,
+   - ROUND((timestampdiff(MINUTE,ro.pickup_time,c.order_time)),1) AS avg_pickup_time,
+    pc.pizza_count,
+	-(ROUND((timestampdiff(MINUTE,ro.pickup_time,c.order_time)/pc.pizza_count),1)) AS time_per_pizza
+FROM
+    cte c
+        JOIN
+    runner_orders ro ON c.order_id = ro.order_id
+		JOIN
+	pizza_count pc ON c.order_id = pc.order_id
+WHERE
+    timestampdiff(MINUTE,ro.pickup_time,c.order_time) IS NOT NULL;
+```
+| order_id | avg_pickup_time | pizza_count | time_per_pizza |
+|----------|-----------------|-------------|---------------|
+| 1        | 10              | 1           | 10.0          |
+| 2        | 10              | 1           | 10.0          |
+| 3        | 21              | 2           | 10.5          |
+| 4        | 29              | 3           | 9.7           |
+| 5        | 10              | 1           | 10.0          |
+| 7        | 10              | 1           | 10.0          |
+| 8        | 20              | 1           | 20.0          |
+| 10       | 15              | 2           | 7.5           |
+
+I don't think there is any connection between the number of pizzas in the order, and the avg cooking time, but there sure is a relationship between the avg pick-up time and the pizzas count, the pickup time increases as the count is rising. 
+
