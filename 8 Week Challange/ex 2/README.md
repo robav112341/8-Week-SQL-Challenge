@@ -435,3 +435,31 @@ WHERE
 | 10       | 1         | 60        |
 
 it is noticeable that the average speed of runners increases every order.
+
+**7. What is the successful delivery percentage for each runner?**
+
+```sql
+SELECT 
+    runner_id,
+    COUNT(*) AS count_successful,
+    ROUND(COUNT(*) / (SELECT 
+                    COUNT(*)
+                FROM
+                    runner_orders ro2
+                WHERE
+                    ro1.runner_id = ro2.runner_id
+                GROUP BY ro2.runner_id) * 100,
+            1) AS percentage
+FROM
+    runner_orders ro1
+WHERE
+    cancellation NOT IN ('Restaurant Cancellation' , 'Customer Cancellation')
+        OR cancellation IS NULL
+GROUP BY 1;
+```
+
+| runner_id | count_successful | percentage |
+|-----------|------------------|------------|
+| 1         | 4                | 100.0      |
+| 2         | 3                | 75.0       |
+| 3         | 1                | 50.0       |
