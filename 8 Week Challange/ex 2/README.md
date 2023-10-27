@@ -26,8 +26,6 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 
 ### A. Pizza Metrics:
 
-***
-
 **1. How many pizzas were ordered?**
 
 ```sql
@@ -288,6 +286,8 @@ ORDER BY 2 DESC;
 | Thursday   | 3           |
 | Friday     | 1           |
 
+***
+
 ### B. Runner and Customer Experience
 
 **1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
@@ -465,6 +465,8 @@ GROUP BY 1;
 | 1         | 4                | 100.0      |
 | 2         | 3                | 75.0       |
 | 3         | 1                | 50.0       |
+
+****
 
 ### C. Ingredient Optimisation
 
