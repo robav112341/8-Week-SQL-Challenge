@@ -26,6 +26,8 @@ Danny started by recruiting “runners” to deliver fresh pizza from Pizza Runn
 
 ### A. Pizza Metrics:
 
+***
+
 **1. How many pizzas were ordered?**
 
 ```sql
