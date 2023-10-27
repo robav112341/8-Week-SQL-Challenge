@@ -286,8 +286,6 @@ ORDER BY 2 DESC;
 | Thursday   | 3           |
 | Friday     | 1           |
 
-**
-
 ### B. Runner and Customer Experience
 
 **1. How many runners signed up for each 1 week period? (i.e. week starts 2021-01-01)**
@@ -529,3 +527,37 @@ anyway, the result is the same:
 |-------------|----------------------------------------------------------------------- |
 | Meatlovers  | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami  |
 | Vegetarian  | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce 	       |
+
+**2. What are the standard ingredients for each pizza?**
+
+```
+WITH RECURSIVE
+  unwound AS (
+    SELECT order_id, extras
+      FROM customer_orders
+    UNION ALL
+    SELECT order_id, regexp_replace(extras, '^[^,]*,', '') extras
+      FROM unwound
+      WHERE extras LIKE '%,%'
+  ),
+  separate_extras AS(
+  SELECT order_id, regexp_replace(extras, ',.*', '') extras
+    FROM unwound
+    ORDER BY order_id)
+SELECT 
+    pt.topping_name, COUNT(*) as ordered
+FROM
+    separate_extras sp
+JOIN
+	pizza_toppings pt ON pt.topping_id = sp.extras
+WHERE
+    extras != 'null'
+GROUP BY sp.extras
+ORDER BY COUNT(*) DESC;
+```
+
+| topping_name | ordered |
+|--------------|---------|
+| Bacon        | 4       |
+| Chicken      | 1       |
+| Cheese       | 1       |
