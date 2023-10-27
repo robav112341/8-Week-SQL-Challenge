@@ -466,3 +466,64 @@ GROUP BY 1;
 
 ### C. Ingredient Optimisation
 
+**1. What are the standard ingredients for each pizza?**
+
+it was much easier with postgreSQL due the fact it has arrays, i found 2 ways which it can be solved in MySQL workbench,
+the first one is WITH RECURSIVE and regexp:
+
+```sql
+WITH RECURSIVE
+  unwound AS (
+    SELECT *
+      FROM pizza_recipes
+    UNION ALL
+    SELECT pizza_id, regexp_replace(toppings, '^[^,]*,', '') toppings
+      FROM unwound
+      WHERE toppings LIKE '%,%'
+  ),
+  separate_toppings AS(
+  SELECT pizza_id, regexp_replace(toppings, ',.*', '') topping_id
+    FROM unwound
+    ORDER BY pizza_id)
+SELECT
+pn.pizza_name, GROUP_CONCAT(pt.topping_name) AS recipie 
+FROM
+separate_toppings st
+JOIN
+pizza_toppings pt ON st.topping_id = pt.topping_id
+JOIN
+pizza_names pn ON st.pizza_id = pn.pizza_id
+GROUP BY st.pizza_id;
+```
+the second way i found is with creating table and insert each pizza topping manully, and then group concat it:
+
+```sql
+DROP TABLE IF EXISTS pizza_help;
+CREATE TABLE pizza_help (
+    pizza_id INT,
+    topping_id INT,
+    PRIMARY KEY (pizza_id, topping_id)
+);
+
+INSERT INTO pizza_help (pizza_id, topping_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 8), (1, 10),
+(2, 4), (2, 6), (2, 7), (2, 9), (2, 11), (2, 12);
+
+SELECT 
+     p.pizza_name,
+    GROUP_CONCAT(t.topping_name SEPARATOR ', ') as all_toppings
+FROM 
+    pizza_names p
+JOIN 
+    pizza_help h ON p.pizza_id = h.pizza_id
+JOIN 
+    pizza_toppings t ON h.topping_id = t.topping_id
+GROUP BY 
+    p.pizza_name;
+```
+anyway, the result is the same:
+
+| pizza_name  | recipie                                   		               |
+|-------------|----------------------------------------------------------------------- |
+| Meatlovers  | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami  |
+| Vegetarian  | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce 	       |
