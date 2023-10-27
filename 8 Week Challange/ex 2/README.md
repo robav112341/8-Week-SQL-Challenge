@@ -286,7 +286,7 @@ ORDER BY 2 DESC;
 | Thursday   | 3           |
 | Friday     | 1           |
 
-***
+**
 
 ### B. Runner and Customer Experience
 
@@ -465,8 +465,6 @@ GROUP BY 1;
 | 1         | 4                | 100.0      |
 | 2         | 3                | 75.0       |
 | 3         | 1                | 50.0       |
-
-****
 
 ### C. Ingredient Optimisation
 
