@@ -680,3 +680,13 @@ FROM
 | 9        | 1        | Meatlovers extra Bacon,Chicken exclude Cheese      	  |
 | 10       | 1        | Meatlovers                                                |
 | 10       | 1        | Meatlovers extra Bacon,Cheese exclude BBQ Sauce,Mushrooms |
+
+**5. Generate an alphabetically ordered comma separated ingredient list for each pizza order from the customer_orders table and add a 2x in front of any relevant ingredients**
+
+**6. What is the total quantity of each ingredient used in all delivered pizzas sorted by most frequent first?**
+
+```sql
+question 5+6 gives me a hard time because I can't use arrays on MySQL, later on, I will try to deal with those questions, as it's not worth the effort atm.
+```
+
+### D. Pricing And Ratings
