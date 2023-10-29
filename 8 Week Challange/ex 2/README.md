@@ -595,3 +595,84 @@ ORDER BY COUNT(*) DESC;
 | Cheese       |    4    |
 | BBQ Sauce    |    1    |
 | Mushrooms    |    1    |
+
+**4. Generate an order item for each record in the customers_orders table in the format of one of the following**
+Meat Lovers
+Meat Lovers - Exclude Beef
+Meat Lovers - Extra Bacon
+Meat Lovers - Exclude Cheese, Bacon - Extra Mushroom, Peppers
+
+```sql
+SELECT 
+    co.order_id,
+    CONCAT(pn.pizza_name,
+            CASE
+                WHEN co.extras = '' THEN ''
+                WHEN co.extras = 'null' THEN ''
+                WHEN co.extras IS NULL THEN ''
+                ELSE CONCAT(' Extra ', (
+                WITH RECURSIVE
+				  unwound AS (
+					SELECT  extras
+					UNION ALL
+					SELECT regexp_replace(extras, '^[^,]*,', '') exclusions
+					  FROM unwound
+					  WHERE extras LIKE '%,%'
+				  ),
+				  separate_extras AS(
+				  SELECT regexp_replace(extras, ',.*', '') exclusions
+					FROM unwound)
+				SELECT
+				group_concat(pt.topping_name)
+				FROM 
+				separate_extras se
+				JOIN
+				pizza_toppings pt ON se.exclusions = pt.topping_id)) END,
+                CASE
+                WHEN co.exclusions = '' THEN ''
+                WHEN co.exclusions = 'null' THEN ''
+                WHEN co.exclusions IS NULL THEN ''
+                ELSE CONCAT(' Exlude ', (
+                WITH RECURSIVE
+				  unwound AS (
+					SELECT  exclusions
+					UNION ALL
+					SELECT regexp_replace(exclusions, '^[^,]*,', '') exclusions
+					  FROM unwound
+					  WHERE exclusions LIKE '%,%'
+				  ),
+				  separate_exclusions AS(
+				  SELECT regexp_replace(exclusions, ',.*', '') exclusions
+					FROM unwound)
+				SELECT
+				group_concat(pt.topping_name)
+				FROM 
+				separate_exclusions se
+				JOIN
+				pizza_toppings pt ON se.exclusions = pt.topping_id)) END) as pizza_name
+FROM
+    customer_orders co
+        JOIN
+    pizza_names pn ON co.pizza_id = pn.pizza_id
+        LEFT JOIN
+    pizza_toppings pt ON co.extras = pt.topping_id
+        LEFT JOIN
+    pizza_toppings pt1 ON co.exclusions = pt1.topping_id;
+```
+
+| order_id | pizza_id | pizza_name                                                |
+|----------|----------|-----------------------------------------------------------|
+| 1        | 1        | Meatlovers                                                |
+| 2        | 1        | Meatlovers                                                |
+| 3        | 1        | Meatlovers                                                |
+| 3        | 2        | Vegetarian                                                |
+| 4        | 1        | Meatlovers exclude Cheese                                 |
+| 4        | 1        | Meatlovers exclude Cheese                      		  |
+| 4        | 2        | Vegetarian exclude Cheese                   	          |
+| 5        | 1        | Meatlovers extra Bacon                      	          |
+| 6        | 2        | Vegetarian                                   	 	  |
+| 7        | 2        | Vegetarian extra Bacon                       	          |
+| 8        | 1        | Meatlovers                                     		  |
+| 9        | 1        | Meatlovers extra Bacon,Chicken exclude Cheese      	  |
+| 10       | 1        | Meatlovers                                                |
+| 10       | 1        | Meatlovers extra Bacon,Cheese exclude BBQ Sauce,Mushrooms |
