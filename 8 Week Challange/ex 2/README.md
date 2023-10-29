@@ -528,7 +528,7 @@ anyway, the result is the same:
 | Meatlovers  | Bacon, BBQ Sauce, Beef, Cheese, Chicken, Mushrooms, Pepperoni, Salami  |
 | Vegetarian  | Cheese, Mushrooms, Onions, Peppers, Tomatoes, Tomato Sauce 	       |
 
-**2. What are the standard ingredients for each pizza?**
+**2. What was the most commonly added extra??**
 
 ```
 WITH RECURSIVE
@@ -561,3 +561,37 @@ ORDER BY COUNT(*) DESC;
 | Bacon        | 4       |
 | Chicken      | 1       |
 | Cheese       | 1       |
+
+**3. What was the most common exclusions?**
+
+```sql
+WITH RECURSIVE
+  unwound AS (
+    SELECT order_id, exclusions
+      FROM customer_orders
+    UNION ALL
+    SELECT order_id, regexp_replace(exclusions, '^[^,]*,', '') exclusions
+      FROM unwound
+      WHERE exclusions LIKE '%,%'
+  ),
+  separate_exclusions AS(
+  SELECT order_id, regexp_replace(exclusions, ',.*', '') exclusions
+    FROM unwound
+    ORDER BY order_id)
+SELECT 
+    pt.topping_name, COUNT(*) as ordered
+FROM
+    separate_exclusions sp
+JOIN
+	pizza_toppings pt ON pt.topping_id = sp.exclusions
+WHERE
+    exclusions != 'null'
+GROUP BY sp.exclusions
+ORDER BY COUNT(*) DESC;
+```
+
+| Topping Name | Ordered |
+|--------------|---------|
+| Cheese       |    4    |
+| BBQ Sauce    |    1    |
+| Mushrooms    |    1    |
