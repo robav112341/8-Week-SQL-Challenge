@@ -690,3 +690,152 @@ question 5+6 gives me a hard time because I can't use arrays on MySQL, later on,
 ```
 
 ### D. Pricing And Ratings
+
+**1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?**
+
+```sql
+SELECT 
+    co.pizza_id,
+    COUNT(*) AS count_orders,
+    (CASE
+        WHEN pizza_id = 1 THEN COUNT(*) * 12
+        ELSE COUNT(*) * 10
+    END) AS sum_revenue
+FROM
+    customer_orders co
+        JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    ro.distance <> 'null'
+GROUP BY pizza_id;
+```
+
+| pizza_id | count_orders | sum_revenue |
+|----------|--------------|------------|
+| 1        | 9            | 108        |
+| 2        | 3            | 30         |
+
+**2. What if there was an additional $1 charge for any pizza extras?**
+
+```sql
+WITH RECURSIVE
+  unwound AS (
+    SELECT order_id, extras
+      FROM customer_orders
+    UNION ALL
+    SELECT order_id, regexp_replace(extras, '^[^,]*,', '') extras
+      FROM unwound
+      WHERE extras LIKE '%,%'
+  ),
+  separate_extras AS(
+  SELECT order_id, regexp_replace(extras, ',.*', '') extras
+    FROM unwound
+    ORDER BY order_id),
+count_extras AS (SELECT count(extras) AS count_extras
+FROM
+separate_extras 
+WHERE extras <> 'null' AND length(extras) >= 1),
+pizza_sum AS (SELECT 
+    co.pizza_id,
+    COUNT(*) AS count_orders,
+    (CASE
+        WHEN pizza_id = 1 THEN COUNT(*) * 12
+        ELSE COUNT(*) * 10
+    END) AS sum_revenue
+FROM
+    customer_orders co
+        JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    ro.distance <> 'null'
+GROUP BY pizza_id)
+SELECT
+((SELECT SUM(sum_revenue) FROM pizza_sum) + (SELECT 1*count_extras FROM count_extras)) AS total_revenue;
+```
+
+| total_revenue |
+|---------------|
+| 144           |
+
+**3. The Pizza Runner team now wants to add an additional ratings system that allows customers to rate their runner, how would you design an additional table for this new dataset - generate a schema for this new table and insert your own data for ratings for each successful customer order between 1 to 5** 
+
+```sql
+DROP TABLE IF EXISTS runner_rating;
+CREATE TABLE runner_rating (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER,
+    customer_id INTEGER,
+    runner_id INTEGER,
+    rating INTEGER,
+    rating_time TIMESTAMP
+  );
+INSERT INTO
+  runner_rating (
+    order_id,
+    customer_id,
+    runner_id,
+    rating,
+    rating_time
+  )
+VALUES
+  ('1', '101', '1', '5', '2020-01-01 19:34:51'),
+  ('2', '101', '1', '5', '2020-01-01 20:23:03'),
+  ('3', '102', '1', '4', '2020-01-03 10:12:58'),
+  ('4', '103', '2', '5', '2020-01-04 16:47:06'),
+  ('5', '104', '3', '5', '2020-01-08 23:09:27'),
+  ('7', '105', '2', '4', '2020-01-08 23:50:12'),
+  ('8', '102', '2', '4', '2020-01-10 12:30:45'),
+  ('10', '104', '1', '5', '2020-01-11 20:05:35');
+ SELECT
+ *
+ FROM
+ runner_rating;
+```
+
+| id | order_id | customer_id | runner_id | rating | rating_time        |
+|----|----------|-------------|-----------|--------|--------------------|
+| 1  | 1        | 101         | 1         | 5      | 2020-01-01 19:34:51|
+| 2  | 2        | 101         | 1         | 5      | 2020-01-01 20:23:03|
+| 3  | 3        | 102         | 1         | 4      | 2020-01-03 10:12:58|
+| 4  | 4        | 103         | 2         | 5      | 2020-01-04 16:47:06|
+| 5  | 5        | 104         | 3         | 5      | 2020-01-08 23:09:27|
+| 6  | 7        | 105         | 2         | 4      | 2020-01-08 23:50:12|
+| 7  | 8        | 102         | 2         | 4      | 2020-01-10 12:30:45|
+| 8  | 10       | 104         | 1         | 5      | 2020-01-11 20:05:35|
+
+**4. Using your newly generated table - can you join all of the information together to form a table which has the following information for successful deliveries?** 
+
+```sql
+SELECT 
+    co.customer_id,
+    ro.order_id,
+    ro.runner_id,
+    rr.id,
+    rr.rating,
+    co.order_time,
+    ro.pickup_time,
+    ro.duration,
+    - TIMESTAMPDIFF(MINUTE,
+        ro.pickup_time,
+        co.order_time) AS time_to_pickup,
+    ROUND((ro.distance / (ro.duration / 60)), 1) AS avg_speed,
+    COUNT(*) AS pizza_num
+FROM
+    runner_orders ro
+        JOIN
+    customer_orders co ON ro.order_id = co.order_id
+        JOIN
+    runner_rating rr ON ro.order_id = rr.order_id
+GROUP BY 2;
+```
+
+| customer_id | order_id | runner_id | id | rating | order_time           | pickup_time         | duration   | time_to_pickup | avg_speed | pizza_num |
+|-------------|----------|-----------|----|--------|----------------------|---------------------|------------|----------------|-----------|-----------|
+| 101         | 1        | 1         | 1  | 5      | 2020-01-01 18:05:02  | 2020-01-01 18:15:34 | 32 minutes | 10             | 37.5      | 1         |
+| 101         | 2        | 1         | 2  | 5      | 2020-01-01 19:00:52  | 2020-01-01 19:10:54 | 27 minutes | 10             | 44.4      | 1         |
+| 102         | 3        | 1         | 3  | 4      | 2020-01-02 23:51:23  | 2020-01-03 00:12:37 | 20 mins    | 21             | 40.2      | 2         |
+| 103         | 4        | 2         | 4  | 5      | 2020-01-04 13:23:46  | 2020-01-04 13:53:03 | 40         | 29             | 35.1      | 3         |
+| 104         | 5        | 3         | 5  | 5      | 2020-01-08 21:00:29  | 2020-01-08 21:10:57 | 15         | 10             | 40        | 1         |
+| 105         | 7        | 2         | 6  | 4      | 2020-01-08 21:20:29  | 2020-01-08 21:30:45 | 25mins     | 10             | 60        | 1         |
+| 102         | 8        | 2         | 7  | 4      | 2020-01-09 23:54:33  | 2020-01-10 00:15:02 | 15 minute  | 20             | 93.6      | 1         |
+| 104         | 10       | 1         | 8  | 5      | 2020-01-11 18:34:49  | 2020-01-11 18:50:20 | 10minutes  | 15             | 60        | 2         |
