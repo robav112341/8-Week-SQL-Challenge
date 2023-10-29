@@ -10,6 +10,7 @@
   - [B. Runner and Customer Experience](#b-runner-and-customer-experience)
   - [C. Ingredient Optimisation](#c-ingredient-optimisation)
   - [D. Pricing and Ratings](#d-pricing-and-ratings)
+  - [E. Bonus Question](#e-bonus-question)
 
 ***
 
@@ -839,3 +840,46 @@ GROUP BY 2;
 | 105         | 7        | 2         | 6  | 4      | 2020-01-08 21:20:29  | 2020-01-08 21:30:45 | 25mins     | 10             | 60        | 1         |
 | 102         | 8        | 2         | 7  | 4      | 2020-01-09 23:54:33  | 2020-01-10 00:15:02 | 15 minute  | 20             | 93.6      | 1         |
 | 104         | 10       | 1         | 8  | 5      | 2020-01-11 18:34:49  | 2020-01-11 18:50:20 | 10minutes  | 15             | 60        | 2         |
+
+**4. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometre traveled - how much money does Pizza Runner have left over after these deliveries?**
+
+```sql
+WITH pizza_revenue AS(
+	SELECT 
+    co.pizza_id,
+    COUNT(*) AS count_orders,
+    (CASE
+        WHEN pizza_id = 1 THEN COUNT(*) * 12
+        ELSE COUNT(*) * 10
+    END) AS sum_revenue
+FROM
+    customer_orders co
+        JOIN
+    runner_orders ro ON co.order_id = ro.order_id
+WHERE
+    ro.distance <> 'null'
+GROUP BY pizza_id)
+SELECT
+SUM(sum_revenue) - (SELECT SUM(distance)*0.3 FROM runner_orders WHERE distance <> 'null') AS total_revenue
+FROM
+pizza_revenue;
+```
+
+| total_revenue |
+|--------------|
+| 94.44        |
+
+### E.Bonus Question:
+
+**If Danny wants to expand his range of pizzas - how would this impact the existing data design? Write an INSERT statement to demonstrate what would happen if a new Supreme pizza with all the toppings was added to the Pizza Runner menu?**
+
+```sql
+INSERT INTO
+  pizza_runner.pizza_names (pizza_id, pizza_name)
+VALUES
+  (3, 'Supreme');
+INSERT INTO
+  pizza_runner.pizza_recipes (pizza_id, toppings)
+VALUES
+  (3, '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12');
+```
